@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow, noarchive">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCA &amp; Time-Series Analysis — Interactive Visual Guide</title>
+<style>
+  :root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-2: #f0f4fa;
+    --border: #dfe6f0;
+    --text: #142033;
+    --muted: #53647e;
+    --accent: #2563eb;
+    --accent-soft: #e8f0fe;
+    --accent-dark: #1d4ed8;
+    --teal: #0d9488;
+    --teal-soft: #e6f7f5;
+    --amber: #d97706;
+    --amber-soft: #fef3c7;
+    --rose: #dc2626;
+    --rose-soft: #fee2e2;
+    --purple: #7c3aed;
+    --purple-soft: #f3e8ff;
+    --radius: 14px;
+    --shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* Topbar */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+  }
+  .brand-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .nav-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .nav-pills a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 999px;
+    transition: all 0.15s;
+  }
+  .nav-pills a:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .lang-toggle {
+    display: inline-flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .lang-toggle button {
+    border: none;
+    background: transparent;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .lang-toggle button.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 1px 4px rgba(37, 99, 235, 0.35);
+  }
+
+  /* Layout */
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 28px 20px 80px;
+  }
+  .hero {
+    background: linear-gradient(135deg, #172554 0%, #1e3a8a 55%, #312e81 100%);
+    color: #fff;
+    border-radius: 20px;
+    padding: 34px 32px;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 30px rgba(30, 58, 138, 0.18);
+  }
+  .hero-kicker {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: rgba(255, 255, 255, 0.14);
+    padding: 4px 11px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  .hero h1 {
+    margin: 0 0 10px;
+    font-size: clamp(24px, 3.4vw, 36px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .hero p {
+    margin: 0;
+    max-width: 760px;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 15.5px;
+  }
+  .hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .hero-chip {
+    font-size: 12.5px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 5px 11px;
+    border-radius: 999px;
+  }
+
+  /* Sections & Cards */
+  section {
+    scroll-margin-top: 76px;
+    margin-bottom: 28px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+    box-shadow: var(--shadow);
+  }
+  .sec-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .sec-num {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 3px 9px;
+    border-radius: 999px;
+    margin-bottom: 6px;
+  }
+  h2 {
+    margin: 0;
+    font-size: 21px;
+    letter-spacing: -0.015em;
+  }
+  .lead {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 14.5px;
+    max-width: 820px;
+  }
+
+  /* Grids */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+  @media (max-width: 820px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .card { padding: 18px; }
+    .hero { padding: 24px 20px; }
+  }
+
+  /* Pipeline */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 900px) {
+    .pipeline { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .pipe-step {
+    border: 1.5px solid var(--border);
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 12px 10px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .pipe-step:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .pipe-step.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.14);
+  }
+  .pipe-step .st-k {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .pipe-step .st-t {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 2px;
+  }
+  .pipe-detail {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 8px 13px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: var(--surface-2); border-color: #bcc8da; }
+  .btn.active, .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent-dark); }
+
+  .slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 190px;
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .slider-group label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .slider-group label span.val {
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  /* Metric boxes & Callouts */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .stat {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 10px 12px;
+  }
+  .stat .k {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .stat .v {
+    font-size: 20px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
+  }
+  .stat.good { background: var(--teal-soft); border-color: #99f6e4; }
+  .stat.good .v { color: var(--teal); }
+  .stat.warn { background: var(--amber-soft); border-color: #fde68a; }
+  .stat.warn .v { color: var(--amber); }
+  .stat.bad { background: var(--rose-soft); border-color: #fecaca; }
+  .stat.bad .v { color: var(--rose); }
+
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 12px 14px;
+    border-radius: 0 10px 10px 0;
+    font-size: 13.8px;
+    margin-top: 12px;
+  }
+  .callout.teal { border-color: var(--teal); background: var(--teal-soft); }
+  .callout.amber { border-color: var(--amber); background: var(--amber-soft); }
+
+  /* Canvas / SVG wrappers */
+  .viz-box {
+    background: #fcfdff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    overflow: hidden;
+  }
+  canvas, svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    display: inline-block;
+  }
+
+  /* Bars for weights/loadings */
+  .bar-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 56px;
+    align-items: center;
+    gap: 10px;
+    margin: 7px 0;
+    font-size: 13px;
+  }
+  .bar-track {
+    position: relative;
+    height: 18px;
+    background: var(--surface-2);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .bar-zero {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #94a3b8;
+  }
+  .bar-fill {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    border-radius: 4px;
+    transition: all 0.25s ease;
+  }
+  .bar-val {
+    text-align: right;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Code Decoder */
+  .code-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .code-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .code-item:hover { border-color: #60a5fa; }
+  .code-item.active {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.35);
+    background: #1e293b;
+  }
+  .code-explain {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+
+  /* Flashcards */
+  .fc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  @media (max-width: 760px) {
+    .fc-grid { grid-template-columns: 1fr; }
+  }
+  .fc {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 15px 16px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .fc:hover { border-color: var(--accent); }
+  .fc.open { background: #f8fbff; border-color: var(--accent); }
+  .fc-q {
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .fc-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .fc-a {
+    display: none;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .fc.open .fc-a { display: block; }
+
+  /* Bilingual visibility */
+  body.lang-en .cz { display: none !important; }
+  body.lang-cz .en { display: none !important; }
+
+  .footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12.5px;
+    margin-top: 36px;
+  }
+</style>
+</head>
+<body class="lang-en">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-badge">PC</div>
+      <span class="en">PCA &amp; Time-Series Visual Guide</span>
+      <span class="cz">PCA a časové řady — Vizuální průvodce</span>
+    </div>
+    <nav class="nav-pills">
+      <a href="#sec-pipeline"><span class="en">Pipeline</span><span class="cz">Postup</span></a>
+      <a href="#sec-seasonality"><span class="en">Seasonality &amp; ADF</span><span class="cz">Sezónnost &amp; ADF</span></a>
+      <a href="#sec-standardize"><span class="en">Standardize</span><span class="cz">Standardizace</span></a>
+      <a href="#sec-pca-geom"><span class="en">PCA Geometry</span><span class="cz">Geometrie PCA</span></a>
+      <a href="#sec-loadings"><span class="en">PC1 &amp; PC2</span><span class="cz">PC1 &amp; PC2</span></a>
+      <a href="#sec-eviews"><span class="en">EViews</span><span class="cz">EViews</span></a>
+      <a href="#sec-quiz"><span class="en">Q&amp;A Cards</span><span class="cz">Otázky</span></a>
+    </nav>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
+      <button id="btn-cz" onclick="setLang('cz')">CZ</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="hero">
+    <div class="hero-kicker">
+      <span class="en">Interactive Econometrics &amp; Data Analysis Explainer</span>
+      <span class="cz">Interaktivní průvodce ekonometrií a analýzou dat</span>
+    </div>
+    <h1>
+      <span class="en">Building an Inflation Pressure Index with PCA</span>
+      <span class="cz">Jak funguje index inflačního tlaku pomocí PCA</span>
+    </h1>
+    <p>
+      <span class="en">Move sliders, flip switches, and rotate axes to build real intuition for every step: year-on-year seasonal removal, ADF stationarity tests, z-score standardization, principal components, loadings, sign flips, and robustness checks.</span>
+      <span class="cz">Posouvej posuvníky, přepínej grafy a otáčej osy. Pochopíš intuitivně každý krok: meziroční očištění sezónnosti, ADF test stacionarity, standardizaci, hlavní komponenty (PC1 a PC2), zátěže, otočení znaménka i kontrolu robustnosti.</span>
+    </p>
+    <div class="hero-chips">
+      <span class="hero-chip"><span class="en">7 Interactive Labs</span><span class="cz">7 interaktivních bloků</span></span>
+      <span class="hero-chip"><span class="en">EN / CZ Instant Switch</span><span class="cz">Přepínání EN / CZ</span></span>
+      <span class="hero-chip"><span class="en">EViews Line Decoder</span><span class="cz">Vysvětlení EViews příkazů</span></span>
+      <span class="hero-chip"><span class="en">8 Defense Flashcards</span><span class="cz">8 kartiček na obhajobu</span></span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: PIPELINE -->
+  <section id="sec-pipeline">
+    <div class="card">
+      <div class="sec-head">
+        <div>
+          <span class="sec-num"><span class="en">Step 1 · Big Picture</span><span class="cz">Krok 1 · Celkový přehled</span></span>
+          <h2>
+            <span class="en">The 6-Step PCA Pipeline (Click Any Step)</span>
+            <span class="cz">6 kroků od surových dat k indexu (klikni na krok)</span>
+          </h2>
+          <p class="lead">
+            <span class="en">Why do we combine 7 monthly price series into 1 index? One single headline number can be noisy or distorted by one category; PCA finds the shared wave moving across the whole economy at once.</span>
+            <span class="cz">Proč spojujeme 7 měsíčních cenových řad do 1 indexu? Jediné číslo může zkreslit jedna položka; PCA najde společnou vlnu, která hýbe celou ekonomikou najednou.</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="pipeline" id="pipeline-steps"></div>
+      <div class="pipe-detail" id="pipeline-detail"></div>
+
+      <!-- Double counting mini-lab -->
+      <div style="margin-top:18px; padding-top:16px; border-top:1px solid var(--border);">
+        <div class="controls" style="justify-content:space-between;">
+          <div>
+            <strong>
+              <span class="en">Why exclude "Core Inflation" from the PCA inputs?</span>
+              <span class="cz">Proč do PCA nedáváme jádrovou inflaci (core)?</span>
+            </strong>
+            <div style="font-size:13px; color:var(--muted);">
+              <span class="en">Core inflation is basically a weighted average of Services + Goods. Toggle it below to see double-counting in action.</span>
+              <span class="cz">Jádrová inflace je v podstatě jen průměr služeb a zboží. Zkus ji níže přidat a podívej se, jak zdvojí jejich váhu.</span>
+            </div>
+          </div>
+          <button id="btn-core-toggle" class="btn" onclick="toggleCoreDemo()">
+            <span class="en">Include Core (Double-Count)</span>
+            <span class="cz">Přidat Core (dvojí započítání)</span>
+          </button>
+        </div>
+        <div id="core-bars"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: SEASONALITY & ADF -->
+  <section id="sec-seasonality">
+    <div class="card">
+      <div class="sec-head">
+        <div>
+          <span class="sec-num"><span class="en">Step 2 · Seasonality &amp; Stationarity</span><span class="cz">Krok 2 · Sezónnost a stacionarita</span></span>
+          <h2>
+            <span class="en">Year-on-Year Seasonality &amp; The ADF Test Paradox</span>
+            <span class="cz">Meziroční změny (y/y) a paradox ADF testu</span>
+          </h2>
+          <p class="lead">
+            <span class="en">Two classic questions come up here: why don't we run X-12 seasonal adjustment, and why can a stable inflation series still fail an ADF test at 5%?</span>
+            <span class="cz">Tady padají dvě klasické otázky: proč nepoužíváme sezónní očištění X-12 a proč může stabilní inflace přesto neprojít ADF testem na 5 %?</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Left: Seasonality -->
+        <div>
+          <h3 style="margin:0 0 8px; font-size:16px;">
+            <span class="en">A. How y/y % Removes Regular Seasonality</span>
+            <span class="cz">A. Jak meziroční % změna odstraní sezónnost</span>
+          </h3>
+          <div class="controls">
+            <button id="btn-seas-raw" class="btn active" onclick="setSeasMode('raw')">
+              <span class="en">Monthly Price Level</span>
+              <span class="cz">Měsíční cenová hladina</span>
+            </button>
+            <button id="btn-seas-yy" class="btn" onclick="setSeasMode('yy')">
+              <span class="en">Year-on-Year % (This Month vs. Last Year)</span>
+              <span class="cz">Meziroční % (stejný měsíc loni)</span>
+            </button>
+          </div>
+          <div class="viz-box">
+            <canvas id="canvas-seas" width="500" height="220"></canvas>
+          </div>
+          <div class="callout teal" id="seas-note"></div>
+        </div>
+
+        <!-- Right: ADF Lab -->
+        <div>
+          <h3 style="margin:0 0 8px; font-size:16px;">
+            <span class="en">B. Interactive ADF Unit-Root Playground</span>
+            <span class="cz">B. Interaktivní hřiště pro ADF test</span>
+          </h3>
+          <div class="controls">
+            <div class="slider-group">
+              <label>
+                <span class="en">One-time Shock Wave (2021–2023)</span>
+                <span class="cz">Velikost jedné inflační vlny</span>
+                <span class="val" id="val-shock">0%</span>
+              </label>
+              <input id="sl-shock" type="range" min="0" max="18" step="1" value="12" oninput="renderADF()">
+            </div>
+            <button id="btn-adf-lvl" class="btn active" onclick="setAdfMode('level')">
+              <span class="en">y/y Level</span>
+              <span class="cz">Meziroční úroveň</span>
+            </button>
+            <button id="btn-adf-diff" class="btn" onclick="setAdfMode('diff')">
+              <span class="en">1st Diff d(x)</span>
+              <span class="cz">1. diference d(x)</span>
+            </button>
+          </div>
+          <div class="viz-box">
+            <canvas id="canvas-adf" width="500" height="190"></canvas>
+          </div>
+          <div class="stat-row" id="adf-stats"></div>
+          <div class="callout amber" id="adf-note"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: STANDARDIZATION -->
+  <section id="sec-standardize">
+    <div class="card">
+      <div class="sec-head">
+        <div>
+          <span class="sec-num"><span class="en">Step 3 · Fair Scaling</span><span class="cz">Krok 3 · Stejné měřítko</span></span>
+          <h2>
+            <span class="en">Why Standardize Before PCA? z = (x − mean) / sd</span>
+            <span class="cz">Proč standardizovat před PCA? z = (x − průměr) / sd</span>
+          </h2>
+          <p class="lead">
+            <span class="en">Energy prices swing by ±40%, while services move by ±4%. PCA chases variance — without standardization, the loudest series takes over the whole index.</span>
+            <span class="cz">Ceny energií skáčou o ±40 %, zatímco služby jen o ±4 %. PCA maximalizuje rozptyl — bez standardizace by si celý index zabrala nejrozkolísanější řada.</span>
+          </p>
+        </div>
+        <button id="btn-std-toggle" class="btn btn-primary" onclick="toggleStandardize()">
+          <span class="en">Switch to: Standardized (z-score)</span>
+          <span class="cz">Přepnout na: Standardizováno (z-skóre)</span>
+        </button>
+      </div>
+
+      <div class="grid-2">
+        <div class="viz-box">
+          <canvas id="canvas-std" width="520" height="230"></canvas>
+          <div class="legend">
+            <span class="legend-item"><span class="dot" style="background:#ef4444"></span><span class="en">Energy (±40% raw)</span><span class="cz">Energie (±40 % surové)</span></span>
+            <span class="legend-item"><span class="dot" style="background:#f59e0b"></span><span class="en">PPI (±25% raw)</span><span class="cz">PPI (±25 % surové)</span></span>
+            <span class="legend-item"><span class="dot" style="background:#2563eb"></span><span class="en">Services (±6% raw)</span><span class="cz">Služby (±6 % surové)</span></span>
+            <span class="legend-item"><span class="dot" style="background:#0d9488"></span><span class="en">Euro Area HICP (±8% raw)</span><span class="cz">Eurozóna HICP (±8 % surové)</span></span>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin:0 0 10px; font-size:15.5px;">
+            <span class="en">Who Controls PC1? (Variance Share)</span>
+            <span class="cz">Kdo ovládá PC1? (podíl na rozptylu)</span>
+          </h3>
+          <div id="std-bars"></div>
+          <div class="callout" id="std-callout"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: PCA GEOMETRY -->
+  <section id="sec-pca-geom">
+    <div class="card">
+      <div class="sec-head">
+        <div>
+          <span class="sec-num"><span class="en">Step 4 · Visual Intuition</span><span class="cz">Krok 4 · Vizuální intuice</span></span>
+          <h2>
+            <span class="en">Rotate the Axis Yourself: What PCA Actually Maximizes</span>
+            <span class="cz">Otoč osu sám/sama: Co PCA vlastně maximalizuje</span>
+          </h2>
+          <p class="lead">
+            <span class="en">Imagine 2 standardized series (e.g., Food and PPI) plotted as dots. PCA rotates a line until the shadows (projections) of the dots are as spread out as possible. That direction is PC1!</span>
+            <span class="cz">Představ si 2 standardizované řady (třeba potraviny a PPI) jako body v rovině. PCA otáčí přímku tak dlouho, až jsou stíny (projekce) bodů co nejvíc roztažené. Tenhle směr je PC1!</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="controls">
+            <div class="slider-group">
+              <label>
+                <span class="en">Axis Angle (θ)</span>
+                <span class="cz">Úhel osy (θ)</span>
+                <span class="val" id="val-angle">20°</span>
+              </label>
+              <input id="sl-angle" type="range" min="0" max="180" step="1" value="20" oninput="renderGeom()">
+            </div>
+            <button class="btn btn-primary" onclick="snapOptimal()">
+              <span class="en">Snap to Optimal PC1</span>
+              <span class="cz">Najít nejlepší PC1</span>
+            </button>
+            <button class="btn" onclick="flipAxisSign()">
+              <span class="en">Flip Sign (× −1)</span>
+              <span class="cz">Otočit znaménko (× −1)</span>
+            </button>
+          </div>
+          <div class="viz-box">
+            <canvas id="canvas-geom" width="500" height="320"></canvas>
+          </div>
+        </div>
+
+        <div>
+          <div class="stat-row" id="geom-stats"></div>
+          <div class="callout" id="geom-explain"></div>
+          <div class="callout teal" style="margin-top:12px;">
+            <strong>
+              <span class="en">Why is the sign of PC1 arbitrary?</span>
+              <span class="cz">Proč je znaménko PC1 libovolné?</span>
+            </strong><br>
+            <span class="en">Click <b>Flip Sign (× −1)</b> above! The line stays in the exact same place and explains the exact same % of variance — only the arrow points the opposite way. That is why in EViews we check <code>if @cor(pc1, hicp) &lt; 0 then pc1 = -pc1</code> so "up" always means higher inflation.</span>
+            <span class="cz">Klikni nahoře na <b>Otočit znaménko (× −1)</b>! Přímka zůstane na úplně stejném místě a vysvětlí úplně stejné % rozptylu — jen šipka míří na druhou stranu. Proto v EViews píšeme <code>if @cor(pc1, hicp) &lt; 0 then pc1 = -pc1</code>, aby "nahoru" vždy znamenalo vyšší inflaci.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: SCREE PLOT, LOADINGS & ROBUSTNESS -->
+  <section id="sec-loadings">
+    <div class="card">
+      <div class="sec-head">
+        <div>
+          <span class="sec-num"><span class="en">Step 5 · Reading the Output</span><span class="cz">Krok 5 · Čtení výsledků</span></span>
+          <h2>
+            <span class="en">Eigenvalues, Loadings (PC1 vs. PC2) &amp; Robustness Check</span>
+            <span class="cz">Vlastní čísla, zátěže (PC1 vs. PC2) a kontrola robustnosti</span>
+          </h2>
+          <p class="lead">
+            <span class="en">Click any component bar in the scree plot, toggle PC1 vs. PC2 loadings, and see why adding import prices (8th series from 2015) leaves the index virtually unchanged (r = 0.996).</span>
+            <span class="cz">Klikni na jakoukoliv komponentu v grafu vlastních čísel, přepni zátěže PC1 vs. PC2 a podívej se, proč přidání dovozních cen (8. řada od 2015) index skoro nezmění (r = 0,996).</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <h3 style="margin:0 0 8px; font-size:15.5px;">
+            <span class="en">A. Scree Plot — How Much Movement Each PC Captures</span>
+            <span class="cz">A. Scree plot — kolik pohybu zachytí každá komponenta</span>
+          </h3>
+          <div class="viz-box">
+            <svg id="svg-scree" viewBox="0 0 500 225"></svg>
+          </div>
+          <div class="stat-row" id="scree-stats"></div>
+        </div>
+
+        <div>
+          <div class="controls" style="justify-content:space-between; margin-bottom:8px;">
+            <h3 style="margin:0; font-size:15.5px;">
+              <span class="en">B. Loadings (Weights in Each Component)</span>
+              <span class="cz">B. Zátěže (váhy řad v komponentě)</span>
+            </h3>
+            <div style="display:flex; gap:6px;">
+              <button id="btn-pc1" class="btn active" onclick="setLoadPC(1)">PC1 (69.3%)</button>
+              <button id="btn-pc2" class="btn" onclick="setLoadPC(2)">PC2 (12.9%)</button>
+            </div>
+          </div>
+          <div id="loadings-bars"></div>
+          <div class="callout" id="loadings-note"></div>
+        </div>
+      </div>
+
+      <!-- Validation & Robustness -->
+      <div style="margin-top:18px; padding-top:16px; border-top:1px solid var(--border);">
+        <div class="controls" style="justify-content:space-between;">
+          <div>
+            <strong>
+              <span class="en">External Validation &amp; Robustness Check</span>
+              <span class="cz">Nezávislé ověření a kontrola robustnosti</span>
+            </strong>
+            <div style="font-size:13px; color:var(--muted);">
+              <span class="en">Compare PC1 (scaled to sd = 1) against headline HICP (excluded from PCA) and the 8-series import-price check.</span>
+              <span class="cz">Srovnej PC1 (přeškálované na sd = 1) s celkovou inflací HICP (mimo PCA) a s 8řadovou kontrolou s dovozními cenami.</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button id="btn-cmp-hicp" class="btn active" onclick="setCmpMode('hicp')">
+              <span class="en">PC1 vs. Headline HICP (r = 0.976)</span>
+              <span class="cz">PC1 vs. celková HICP (r = 0,976)</span>
+            </button>
+            <button id="btn-cmp-rob" class="btn" onclick="setCmpMode('rob')">
+              <span class="en">7 Series vs. +Import Prices (r = 0.996)</span>
+              <span class="cz">7 řad vs. +dovozní ceny (r = 0,996)</span>
+            </button>
+          </div>
+        </div>
+        <div class="viz-box">
+          <canvas id="canvas-cmp" width="980" height="210"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: EVIEWS DECODER -->
+  <section id="sec-eviews">
+    <div class="card">
+      <div class="sec-head">
+        <div>
+          <span class="sec-num"><span class="en">Step 6 · Code Literacy</span><span class="cz">Krok 6 · Jak číst kód</span></span>
+          <h2>
+            <span class="en">EViews Command Decoder (Click Any Line)</span>
+            <span class="cz">Překladač příkazů v EViews (klikni na řádek)</span>
+          </h2>
+          <p class="lead">
+            <span class="en">Click any line from a typical EViews PCA script to see what each keyword and option does in plain language.</span>
+            <span class="cz">Klikni na libovolný řádek z EViews skriptu pro PCA a hned uvidíš, co přesně dělá každá část příkazu.</span>
+          </p>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="code-list" id="eviews-list"></div>
+        <div class="code-explain" id="eviews-detail"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: FLASHCARDS -->
+  <section id="sec-quiz">
+    <div class="card">
+      <div class="sec-head">
+        <div>
+          <span class="sec-num"><span class="en">Step 7 · Quick Self-Test</span><span class="cz">Krok 7 · Rychlý test</span></span>
+          <h2>
+            <span class="en">8 "What If Someone Asks?" Flashcards (Click to Reveal)</span>
+            <span class="cz">8 kartiček "Co když se zeptají?" (klikni pro odpověď)</span>
+          </h2>
+          <p class="lead">
+            <span class="en">Practice answering the sharpest follow-up questions in one or two clear, confident sentences.</span>
+            <span class="cz">Procvič si stručné a jasné odpovědi na nejčastější doplňující otázky k metodě a výsledkům.</span>
+          </p>
+        </div>
+      </div>
+      <div class="fc-grid" id="flashcards"></div>
+    </div>
+  </section>
+
+  <div class="footer">
+    <span class="en">Self-contained interactive study guide · Works offline in any browser</span>
+    <span class="cz">Samostatný interaktivní studijní průvodce · Funguje v každém prohlížeči</span>
+  </div>
+</main>
+
+<script>
+let LANG = 'en';
+
+function setLang(l) {
+  LANG = l;
+  document.body.className = 'lang-' + l;
+  document.getElementById('btn-en').classList.toggle('active', l === 'en');
+  document.getElementById('btn-cz').classList.toggle('active', l === 'cz');
+  renderPipeline();
+  renderCoreDemo();
+  renderSeasonality();
+  renderADF();
+  renderStandardize();
+  renderGeom();
+  renderScree();
+  renderLoadings();
+  renderComparison();
+  renderEViews();
+  renderFlashcards();
+}
+
+/* ==================== 1. PIPELINE ==================== */
+const PIPE_STEPS = [
+  {
+    k: '01', enT: 'Select Series', czT: 'Výběr řad',
+    enBody: 'Pick indicators covering different channels of price pressure (consumer food, energy, services, goods, producer prices, foreign inflation, exchange rate). Keep headline inflation outside as an independent benchmark, and exclude composites (like core = services + goods) to avoid double-counting.',
+    czBody: 'Vyber řady z různých částí ekonomiky (potraviny, energie, služby, zboží, ceny výrobců, zahraniční inflace, kurz). Celkovou inflaci nech stranou pro nezávislé srovnání a vyluč souhrnné řady (jako core = služby + zboží), aby nedošlo k dvojímu započítání.'
+  },
+  {
+    k: '02', enT: 'Seasonality', czT: 'Sezónnost',
+    enBody: 'Because every series is measured as a year-on-year % change (e.g. Sept 2025 vs. Sept 2024), regular calendar swings (winter heating, summer holidays) mostly cancel out automatically. No X-12/X-13 seasonal adjustment is needed.',
+    czBody: 'Protože jsou všechny řady v meziročních procentních změnách (např. září 2025 proti září 2024), pravidelné roční výkyvy (zimní topení, letní dovolené) se z velké části samy odečtou. Není potřeba X-12/X-13.'
+  },
+  {
+    k: '03', enT: 'ADF Stationarity', czT: 'ADF stacionarita',
+    enBody: 'Check whether series return to a stable long-run mean (constant, lags by Schwarz SIC). Even if slow series fail at 5% because of one huge 2021–2023 spike, y/y inflation cannot drift to infinity — keeping levels preserves the meaning "inflation pressure" instead of "change in inflation".',
+    czBody: 'Ověř pomocí ADF testu (s konstantou, zpoždění podle SIC), zda se řady vrací ke stabilní úrovni. I když pomalejší řady u 5 % neprojdou kvůli jedné obří vlně 2021–2023, meziroční inflace nemůže ujíždět donekonečna — ponechání úrovní zachová význam "síla inflačního tlaku".'
+  },
+  {
+    k: '04', enT: 'Standardize', czT: 'Standardizace',
+    enBody: 'Transform every input to z = (x − mean) / sd so each has mean 0 and standard deviation 1. Without this, volatile energy (±40%) and PPI (±25%) would dominate PCA while calmer services (±5%) would be ignored.',
+    czBody: 'Každou řadu převeď vzorcem z = (x − průměr) / sd na průměr 0 a směrodatnou odchylku 1. Bez toho by rozkolísané energie (±40 %) a PPI (±25 %) ovládly celé PCA a klidnější služby by zmizely.'
+  },
+  {
+    k: '05', enT: 'Run PCA', czT: 'Výpočet PCA',
+    enBody: 'Extract orthogonal components ordered by variance explained. PC1 captures 69.3% (eigenvalue 4.85) with balanced weights across all 6 price series = common inflation wave. PC2 captures 12.9% = exchange-rate factor. Flip signs for clear economic direction and scale to sd = 1.',
+    czBody: 'Spočítej ortogonální hlavní komponenty podle vysvětleného rozptylu. PC1 zachytí 69,3 % (vlastní číslo 4,85) s vyrovnanými váhami všech 6 cenových řad = společná inflační vlna. PC2 zachytí 12,9 % = kurzová složka. Otoč znaménka pro jasný směr a přeškáluj na sd = 1.'
+  },
+  {
+    k: '06', enT: 'Validate', czT: 'Ověření',
+    enBody: 'Check PC1 against excluded headline HICP (r = 0.976!) and run a robustness check adding an 8th series (import prices on the shorter 2015–2026 sample: r = 0.996). This proves the index is reliable and not sensitive to one missing series.',
+    czBody: 'Porovnej PC1 s vynechanou celkovou inflací HICP (r = 0,976!) a udělej kontrolu robustnosti s 8. řadou (dovozní ceny od roku 2015: r = 0,996). Tím dokážeš, že index je spolehlivý a stabilní.'
+  }
+];
+let activePipe = 0;
+function renderPipeline() {
+  const wrap = document.getElementById('pipeline-steps');
+  wrap.innerHTML = PIPE_STEPS.map((s, i) => `
+    <button class="pipe-step ${i === activePipe ? 'active' : ''}" onclick="activePipe=${i};renderPipeline()">
+      <div class="st-k">${s.k}</div>
+      <div class="st-t">${LANG === 'en' ? s.enT : s.czT}</div>
+    </button>
+  `).join('');
+  const cur = PIPE_STEPS[activePipe];
+  document.getElementById('pipeline-detail').innerHTML = `
+    <div style="font-weight:700; margin-bottom:4px; color:var(--accent-dark);">
+      ${cur.k}. ${LANG === 'en' ? cur.enT : cur.czT}
+    </div>
+    <div style="font-size:14px;">${LANG === 'en' ? cur.enBody : cur.czBody}</div>
+  `;
+}
+
+let includeCore = false;
+function toggleCoreDemo() {
+  includeCore = !includeCore;
+  renderCoreDemo();
+}
+function renderCoreDemo() {
+  const btn = document.getElementById('btn-core-toggle');
+  btn.classList.toggle('active', includeCore);
+  btn.innerHTML = includeCore
+    ? (LANG === 'en' ? 'Core INCLUDED (Distorted!)' : 'Core PŘIDÁNO (Zkresleno!)')
+    : (LANG === 'en' ? 'Include Core (Double-Count)' : 'Přidat Core (dvojí započítání)');
+
+  const items = includeCore
+    ? [
+        { name: 'services + goods + core', val: 46, color: '#dc2626' },
+        { name: 'food', val: 14, color: '#2563eb' },
+        { name: 'energy', val: 14, color: '#2563eb' },
+        { name: 'ppi', val: 14, color: '#2563eb' },
+        { name: 'ea_hicp', val: 12, color: '#2563eb' }
+      ]
+    : [
+        { name: 'services + goods', val: 33, color: '#0d9488' },
+        { name: 'food', val: 17, color: '#2563eb' },
+        { name: 'energy', val: 17, color: '#2563eb' },
+        { name: 'ppi', val: 17, color: '#2563eb' },
+        { name: 'ea_hicp', val: 16, color: '#2563eb' }
+      ];
+  document.getElementById('core-bars').innerHTML = items.map(it => `
+    <div class="bar-row">
+      <div style="font-weight:600; font-size:12.5px;">${it.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="left:0; width:${it.val * 2}%; background:${it.color};"></div>
+      </div>
+      <div class="bar-val">${it.val}%</div>
+    </div>
+  `).join('');
+}
+
+/* ==================== 2. SEASONALITY & ADF ==================== */
+let seasMode = 'raw';
+function setSeasMode(m) {
+  seasMode = m;
+  document.getElementById('btn-seas-raw').classList.toggle('active', m === 'raw');
+  document.getElementById('btn-seas-yy').classList.toggle('active', m === 'yy');
+  renderSeasonality();
+}
+function renderSeasonality() {
+  const c = document.getElementById('canvas-seas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const months = 60;
+  const raw = [];
+  for (let t = 0; t < months; t++) {
+    const m = t % 12;
+    const seas = 4.2 * Math.sin((2 * Math.PI * (m - 1)) / 12) + 1.4 * Math.cos((4 * Math.PI * m) / 12);
+    const trend = 100 + 0.25 * t + (t > 30 && t < 46 ? 6 * Math.sin(Math.PI * (t - 30) / 16) : 0);
+    raw.push(trend + seas);
+  }
+  const yy = [];
+  for (let t = 12; t < months; t++) {
+    yy.push(((raw[t] - raw[t - 12]) / raw[t - 12]) * 100);
+  }
+
+  const data = seasMode === 'raw' ? raw.slice(12) : yy;
+  const minV = seasMode === 'raw' ? 98 : -2;
+  const maxV = seasMode === 'raw' ? 124 : 11;
+  const padL = 42, padR = 16, padT = 18, padB = 28;
+  const pw = W - padL - padR, ph = H - padT - padB;
+
+  // Grid
+  ctx.strokeStyle = '#e5edf7';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (ph * i) / 4;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+    const lbl = (maxV - ((maxV - minV) * i) / 4).toFixed(0) + (seasMode === 'yy' ? '%' : '');
+    ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif'; ctx.fillText(lbl, 6, y + 4);
+  }
+
+  // Line
+  ctx.strokeStyle = seasMode === 'raw' ? '#d97706' : '#0d9488';
+  ctx.lineWidth = 2.6;
+  ctx.beginPath();
+  data.forEach((v, i) => {
+    const x = padL + (i / (data.length - 1)) * pw;
+    const y = padT + ((maxV - v) / (maxV - minV)) * ph;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Year ticks
+  ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif';
+  for (let yr = 0; yr < 4; yr++) {
+    const x = padL + ((yr * 12) / (data.length - 1)) * pw;
+    ctx.fillText('Y' + (yr + 1), x, H - 8);
+  }
+
+  document.getElementById('seas-note').innerHTML = seasMode === 'raw'
+    ? (LANG === 'en'
+        ? '<b>Raw monthly index:</b> Repeating winter/summer humps every 12 months hide the underlying inflation wave.'
+        : '<b>Surová měsíční hladina:</b> Každých 12 měsíců se opakují zimní a letní vlny, které překrývají skutečný trend inflace.')
+    : (LANG === 'en'
+        ? '<b>Year-on-Year % change:</b> Comparing Jan vs. last Jan cancels out the regular seasonal humps, leaving the clean inflation wave!'
+        : '<b>Meziroční % změna:</b> Porovnání ledna s loňským lednem pravidelné sezónní výkyvy z velké části odstraní a ukáže čistou inflační vlnu!');
+}
+
+let adfMode = 'level';
+function setAdfMode(m) {
+  adfMode = m;
+  document.getElementById('btn-adf-lvl').classList.toggle('active', m === 'level');
+  document.getElementById('btn-adf-diff').classList.toggle('active', m === 'diff');
+  renderADF();
+}
+function renderADF() {
+  const shock = Number(document.getElementById('sl-shock').value);
+  document.getElementById('val-shock').textContent = '+' + shock + '%';
+
+  // Deterministic pseudo-random stationary AR(1) around 2% + optional 2021-2023 wave
+  const N = 200;
+  const lvl = [];
+  let y = 2.0;
+  for (let t = 0; t < N; t++) {
+    const eps = 0.45 * Math.sin(t * 1.73) + 0.35 * Math.cos(t * 0.67) + 0.25 * Math.sin(t * 3.11);
+    const wave = (t >= 145 && t <= 180) ? shock * Math.pow(Math.sin(Math.PI * (t - 145) / 35), 1.4) : 0;
+    y = 2.0 + 0.86 * (y - 2.0) + eps;
+    lvl.push(y + wave);
+  }
+  const diff = [];
+  for (let t = 1; t < N; t++) diff.push(lvl[t] - lvl[t - 1]);
+  const arr = adfMode === 'level' ? lvl : diff;
+
+  // Compute simple DF t-stat: Δx_t = a + g * x_{t-1} + e_t
+  const xs = [], ys = [];
+  for (let t = 1; t < arr.length; t++) {
+    xs.push(arr[t - 1]);
+    ys.push(arr[t] - arr[t - 1]);
+  }
+  const n = xs.length;
+  const mx = xs.reduce((a, b) => a + b, 0) / n;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  let sxx = 0, sxy = 0;
+  for (let i = 0; i < n; i++) { sxx += (xs[i] - mx) ** 2; sxy += (xs[i] - mx) * (ys[i] - my); }
+  const g = sxy / sxx;
+  const a = my - g * mx;
+  let rss = 0;
+  for (let i = 0; i < n; i++) { const e = ys[i] - (a + g * xs[i]); rss += e * e; }
+  const se = Math.sqrt((rss / (n - 2)) / sxx);
+  const tStat = g / se;
+  const crit5 = -2.87;
+  const passes = tStat < crit5;
+
+  // Draw
+  const c = document.getElementById('canvas-adf');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+  const padL = 38, padR = 14, padT = 14, padB = 22;
+  const pw = W - padL - padR, ph = H - padT - padB;
+  const minV = Math.min(...arr, 0) - 1;
+  const maxV = Math.max(...arr, 4) + 1;
+
+  // Mean line
+  const meanV = adfMode === 'level' ? 2.0 : 0.0;
+  const yMean = padT + ((maxV - meanV) / (maxV - minV)) * ph;
+  ctx.setLineDash([5, 4]);
+  ctx.strokeStyle = '#94a3b8';
+  ctx.beginPath(); ctx.moveTo(padL, yMean); ctx.lineTo(W - padR, yMean); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.strokeStyle = passes ? '#0d9488' : '#dc2626';
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  arr.forEach((v, i) => {
+    const x = padL + (i / (arr.length - 1)) * pw;
+    const y = padT + ((maxV - v) / (maxV - minV)) * ph;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif';
+  ctx.fillText(maxV.toFixed(0) + '%', 4, padT + 8);
+  ctx.fillText(meanV.toFixed(0) + '%', 4, yMean + 4);
+
+  const verdict = passes
+    ? (LANG === 'en' ? 'Stationary (5%)' : 'Stacionární (5 %)')
+    : (LANG === 'en' ? 'Fails at 5%!' : 'Nezamítá u 5 %!');
+  document.getElementById('adf-stats').innerHTML = `
+    <div class="stat ${passes ? 'good' : 'bad'}">
+      <div class="k">ADF t-stat</div>
+      <div class="v">${tStat.toFixed(2)}</div>
+    </div>
+    <div class="stat">
+      <div class="k">${LANG === 'en' ? '5% Critical Value' : '5% krit. hodnota'}</div>
+      <div class="v">${crit5.toFixed(2)}</div>
+    </div>
+    <div class="stat ${passes ? 'good' : 'bad'}">
+      <div class="k">${LANG === 'en' ? 'Test Result' : 'Výsledek'}</div>
+      <div class="v" style="font-size:15px;">${verdict}</div>
+    </div>
+  `;
+  document.getElementById('adf-note').innerHTML = adfMode === 'diff'
+    ? (LANG === 'en'
+        ? '<b>First difference d(x):</b> Always passes ADF easily, but it changes the economic meaning from "how strong is inflation pressure" to "is inflation accelerating or slowing down".'
+        : '<b>První diference d(x):</b> Vždy snadno projde ADF testem, ale změní ekonomický význam z "jak silný je inflační tlak" na "zda inflace zrovna zrychluje nebo zpomaluje".')
+    : (shock >= 10
+        ? (LANG === 'en'
+            ? '<b>See the paradox!</b> The underlying series always returns to 2%, yet one huge inflation wave makes the 20-year ADF test hesitate (t-stat moves right of −2.87).'
+            : '<b>Tady vidíš ten paradox!</b> Řada se pořád vrací ke 2 %, ale jedna obří inflační vlna ve dvacetiletém vzorku způsobí, že ADF test zaváhá (t-stat se posune napravo od −2,87).')
+        : (LANG === 'en'
+            ? '<b>Normal times (small shock):</b> Without a massive one-off spike, ADF clearly confirms the series reverts to its long-run mean (t &lt; −2.87). Try dragging the shock slider up!'
+            : '<b>Klidné období (malý šok):</b> Bez extrémní vlny ADF test jasně potvrdí návrat k průměru (t &lt; −2,87). Zkus posuvník vlny vytáhnout doprava!'));
+}
+
+/* ==================== 3. STANDARDIZATION ==================== */
+let isStd = false;
+function toggleStandardize() {
+  isStd = !isStd;
+  renderStandardize();
+}
+function renderStandardize() {
+  const btn = document.getElementById('btn-std-toggle');
+  btn.innerHTML = isStd
+    ? (LANG === 'en' ? 'Showing: Standardized (Click for Raw)' : 'Zobrazeno: Standardizováno (Klikni pro surové)')
+    : (LANG === 'en' ? 'Showing: Raw % (Click to Standardize)' : 'Zobrazeno: Surová % (Klikni pro standardizaci)');
+
+  const c = document.getElementById('canvas-std');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const N = 80;
+  const wave = i => Math.exp(-Math.pow((i - 56) / 7, 2)) + 0.28 * Math.exp(-Math.pow((i - 12) / 6, 2)) - 0.22 * Math.exp(-Math.pow((i - 32) / 10, 2));
+  const series = [
+    { name: 'energy', color: '#ef4444', amp: 36, base: 4, noise: 3.0 },
+    { name: 'ppi',    color: '#f59e0b', amp: 24, base: 3, noise: 1.8 },
+    { name: 'ea_hicp',color: '#0d9488', amp: 8,  base: 2, noise: 0.7 },
+    { name: 'serv',   color: '#2563eb', amp: 6,  base: 3, noise: 0.5 }
+  ].map(s => {
+    const raw = Array.from({ length: N }, (_, i) => s.base + s.amp * wave(i) + s.noise * Math.sin(i * 0.9 + s.amp));
+    const m = raw.reduce((a, b) => a + b, 0) / N;
+    const sd = Math.sqrt(raw.reduce((a, b) => a + (b - m) ** 2, 0) / N);
+    return { ...s, raw, z: raw.map(v => (v - m) / sd), sd };
+  });
+
+  const padL = 42, padR = 14, padT = 16, padB = 24;
+  const pw = W - padL - padR, ph = H - padT - padB;
+  const minV = isStd ? -2.2 : -10;
+  const maxV = isStd ? 4.2 : 44;
+
+  ctx.strokeStyle = '#e5edf7'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (ph * i) / 4;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+    const lbl = (maxV - ((maxV - minV) * i) / 4).toFixed(isStd ? 1 : 0) + (isStd ? ' sd' : '%');
+    ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif'; ctx.fillText(lbl, 4, y + 4);
+  }
+
+  series.forEach(s => {
+    const arr = isStd ? s.z : s.raw;
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = 2.3;
+    ctx.beginPath();
+    arr.forEach((v, i) => {
+      const x = padL + (i / (N - 1)) * pw;
+      const y = padT + ((maxV - v) / (maxV - minV)) * ph;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  });
+
+  const shares = isStd
+    ? [ { n: 'energy', p: 25, c: '#ef4444' }, { n: 'ppi', p: 26, c: '#f59e0b' }, { n: 'ea_hicp', p: 25, c: '#0d9488' }, { n: 'serv', p: 24, c: '#2563eb' } ]
+    : [ { n: 'energy', p: 66, c: '#ef4444' }, { n: 'ppi', p: 29, c: '#f59e0b' }, { n: 'ea_hicp', p: 3,  c: '#0d9488' }, { n: 'serv', p: 2,  c: '#2563eb' } ];
+  document.getElementById('std-bars').innerHTML = shares.map(s => `
+    <div class="bar-row">
+      <div style="font-weight:700;">${s.n}</div>
+      <div class="bar-track"><div class="bar-fill" style="left:0; width:${s.p}%; background:${s.c};"></div></div>
+      <div class="bar-val">${s.p}%</div>
+    </div>
+  `).join('');
+
+  document.getElementById('std-callout').innerHTML = isStd
+    ? (LANG === 'en'
+        ? '<b>Standardized (mean 0, sd 1):</b> Now all four series move on the exact same vertical scale! A value of +2 means "2 standard deviations above its own 20-year average" for every series, so each gets a fair ~25% vote in PC1.'
+        : '<b>Standardizováno (průměr 0, sd 1):</b> Teď se všechny řady hýbou ve stejném měřítku! Hodnota +2 znamená u každé řady totéž (2 směrodatné odchylky nad průměrem) a všechny mají v PC1 vyrovnaný hlas ~25 %.')
+    : (LANG === 'en'
+        ? '<b>Unstandardized:</b> Energy alone accounts for ~66% of total variance and PPI another ~29%. Services (2%) and Euro Area HICP (3%) are basically invisible to PCA!'
+        : '<b>Nestandardizováno:</b> Samotné energie tvoří ~66 % celkového rozptylu a PPI dalších ~29 %. Služby (2 %) a eurozóna (3 %) jsou pro PCA skoro neviditelné!');
+}
+
+/* ==================== 4. PCA GEOMETRY ==================== */
+const PTS = [];
+for (let i = 0; i < 60; i++) {
+  const u = (Math.sin(i * 12.9898) * 43758.5453) % 1;
+  const v = (Math.sin(i * 78.233) * 19341.1234) % 1;
+  const g1 = (u - 0.5) * 3.4;
+  const g2 = (v - 0.5) * 0.95;
+  const rad = 42 * Math.PI / 180;
+  const x = g1 * Math.cos(rad) - g2 * Math.sin(rad);
+  const y = g1 * Math.sin(rad) + g2 * Math.cos(rad);
+  PTS.push([x, y]);
+}
+// Compute true optimal angle
+let sxx = 0, syy = 0, sxy = 0;
+PTS.forEach(([x, y]) => { sxx += x * x; syy += y * y; sxy += x * y; });
+const totalVar = (sxx + syy) / PTS.length;
+const optRad = 0.5 * Math.atan2(2 * sxy, sxx - syy);
+const optDeg = Math.round(((optRad * 180 / Math.PI) + 180) % 180);
+let signFlip = 1;
+
+function snapOptimal() {
+  document.getElementById('sl-angle').value = optDeg;
+  renderGeom();
+}
+function flipAxisSign() {
+  signFlip *= -1;
+  renderGeom();
+}
+function renderGeom() {
+  const deg = Number(document.getElementById('sl-angle').value);
+  document.getElementById('val-angle').textContent = deg + '°' + (signFlip < 0 ? ' (× −1)' : '');
+  const rad = deg * Math.PI / 180;
+  const ux = Math.cos(rad) * signFlip, uy = Math.sin(rad) * signFlip;
+  const vx = -uy, vy = ux;
+
+  let var1 = 0, var2 = 0;
+  PTS.forEach(([x, y]) => {
+    const p1 = x * ux + y * uy;
+    const p2 = x * vx + y * vy;
+    var1 += p1 * p1; var2 += p2 * p2;
+  });
+  var1 /= PTS.length; var2 /= PTS.length;
+  const pct1 = (var1 / totalVar) * 100;
+  const pct2 = (var2 / totalVar) * 100;
+
+  const c = document.getElementById('canvas-geom');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+  const cx = W / 2, cy = H / 2, sc = 64;
+
+  // Axes
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(20, cy); ctx.lineTo(W - 20, cy); ctx.moveTo(cx, 16); ctx.lineTo(cx, H - 16); ctx.stroke();
+
+  // PC2 perpendicular line
+  ctx.strokeStyle = '#cbd5e1'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(cx - vx * 160, cy + vy * 160); ctx.lineTo(cx + vx * 160, cy - vy * 160); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // PC1 candidate line
+  const isOpt = Math.abs(deg - optDeg) <= 2;
+  ctx.strokeStyle = isOpt ? '#0d9488' : '#2563eb';
+  ctx.lineWidth = 2.6;
+  ctx.beginPath(); ctx.moveTo(cx - ux * 190, cy + uy * 190); ctx.lineTo(cx + ux * 190, cy - uy * 190); ctx.stroke();
+
+  // Arrow tip showing sign direction
+  const ax = cx + ux * 170, ay = cy - uy * 170;
+  ctx.fillStyle = isOpt ? '#0d9488' : '#2563eb';
+  ctx.beginPath(); ctx.arc(ax, ay, 5.5, 0, Math.PI * 2); ctx.fill();
+  ctx.font = 'bold 12px sans-serif';
+  ctx.fillText(signFlip > 0 ? '+PC1' : '−PC1', ax + 8, ay - 6);
+
+  // Projection lines + points
+  PTS.forEach(([x, y]) => {
+    const p1 = x * ux + y * uy;
+    const px = p1 * ux, py = p1 * uy;
+    ctx.strokeStyle = 'rgba(37, 99, 235, 0.18)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(cx + x * sc, cy - y * sc); ctx.lineTo(cx + px * sc, cy - py * sc); ctx.stroke();
+
+    // Projected shadow dot
+    ctx.fillStyle = isOpt ? '#0d9488' : '#2563eb';
+    ctx.beginPath(); ctx.arc(cx + px * sc, cy - py * sc, 2.7, 0, Math.PI * 2); ctx.fill();
+
+    // Original dot
+    ctx.fillStyle = '#334155';
+    ctx.beginPath(); ctx.arc(cx + x * sc, cy - y * sc, 3.6, 0, Math.PI * 2); ctx.fill();
+  });
+
+  document.getElementById('geom-stats').innerHTML = `
+    <div class="stat ${isOpt ? 'good' : ''}">
+      <div class="k">${LANG === 'en' ? 'Captured by Axis 1' : 'Zachyceno osou 1'}</div>
+      <div class="v">${pct1.toFixed(1)}%</div>
+    </div>
+    <div class="stat">
+      <div class="k">${LANG === 'en' ? 'Remaining (Axis 2 ⊥)' : 'Zbytek (osa 2 ⊥)'}</div>
+      <div class="v">${pct2.toFixed(1)}%</div>
+    </div>
+  `;
+  document.getElementById('geom-explain').innerHTML = isOpt
+    ? (LANG === 'en'
+        ? '<b>Spot on! You found PC1!</b> At ~' + optDeg + '°, the shadows on the line are maximally spread out and the perpendicular distances (errors) are as tiny as possible.'
+        : '<b>Přesně trefeno! To je PC1!</b> Kolem ' + optDeg + '° jsou stíny bodů na přímce co nejvíc roztažené a kolmé odchylky od přímky jsou nejmenší možné.')
+    : (LANG === 'en'
+        ? 'Drag the angle slider toward <b>' + optDeg + '°</b> (or click <b>Snap to Optimal PC1</b>) and watch the captured variance climb to its maximum!'
+        : 'Posuň úhel k <b>' + optDeg + '°</b> (nebo klikni na <b>Najít nejlepší PC1</b>) a sleduj, jak vysvětlený rozptyl roste na maximum!');
+}
+
+/* ==================== 5. SCREE, LOADINGS & COMPARISON ==================== */
+const SCREE = [
+  { pc: 'PC1', eig: 4.848, pct: 69.3, cum: 69.3 },
+  { pc: 'PC2', eig: 0.906, pct: 12.9, cum: 82.2 },
+  { pc: 'PC3', eig: 0.386, pct: 5.5,  cum: 87.7 },
+  { pc: 'PC4', eig: 0.348, pct: 5.0,  cum: 92.7 },
+  { pc: 'PC5', eig: 0.320, pct: 4.6,  cum: 97.3 },
+  { pc: 'PC6', eig: 0.138, pct: 2.0,  cum: 99.2 },
+  { pc: 'PC7', eig: 0.054, pct: 0.8,  cum: 100.0 }
+];
+let selScree = 0;
+function renderScree() {
+  const svg = document.getElementById('svg-scree');
+  const W = 500, H = 225, padL = 40, padB = 30, padT = 20, padR = 16;
+  const pw = W - padL - padR, ph = H - padT - padB;
+  const maxE = 5.4;
+  const yKaiser = padT + ((maxE - 1.0) / maxE) * ph;
+
+  let html = '';
+  // Kaiser line (eigenvalue = 1)
+  html += `<line x1="${padL}" y1="${yKaiser}" x2="${W - padR}" y2="${yKaiser}" stroke="#d97706" stroke-dasharray="5,4" stroke-width="1.5"/>`;
+  html += `<text x="${W - padR - 4}" y="${yKaiser - 5}" text-anchor="end" font-size="11" fill="#b45309" font-weight="700">λ = 1 (Kaiser)</text>`;
+
+  const bw = pw / SCREE.length - 12;
+  SCREE.forEach((d, i) => {
+    const x = padL + i * (pw / SCREE.length) + 6;
+    const bh = (d.eig / maxE) * ph;
+    const y = padT + ph - bh;
+    const fill = i === selScree ? '#2563eb' : (i === 0 ? '#60a5fa' : '#cbd5e1');
+    html += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="6" fill="${fill}" style="cursor:pointer" onclick="selScree=${i};renderScree()"/>`;
+    html += `<text x="${x + bw / 2}" y="${y - 5}" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">${d.pct}%</text>`;
+    html += `<text x="${x + bw / 2}" y="${H - 10}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#475569">${d.pc}</text>`;
+  });
+  svg.innerHTML = html;
+
+  const s = SCREE[selScree];
+  document.getElementById('scree-stats').innerHTML = `
+    <div class="stat"><div class="k">${s.pc} ${LANG === 'en' ? 'Eigenvalue' : 'Vlastní číslo'}</div><div class="v">${s.eig.toFixed(3)}</div></div>
+    <div class="stat good"><div class="k">${LANG === 'en' ? 'Variance Share' : 'Podíl rozptylu'}</div><div class="v">${s.pct}%</div></div>
+    <div class="stat"><div class="k">${LANG === 'en' ? 'Cumulative' : 'Kumulativně'}</div><div class="v">${s.cum}%</div></div>
+  `;
+}
+
+const LOADINGS = [
+  { s: 'ea_hicp', pc1:  0.437, pc2: -0.021 },
+  { s: 'ppi',     pc1:  0.408, pc2:  0.019 },
+  { s: 'serv',    pc1:  0.399, pc2:  0.125 },
+  { s: 'energy',  pc1:  0.397, pc2:  0.002 },
+  { s: 'goods',   pc1:  0.383, pc2:  0.320 },
+  { s: 'food',    pc1:  0.377, pc2:  0.022 },
+  { s: 'CZK/EUR', pc1: -0.191, pc2:  0.939 }
+];
+let loadPC = 1;
+function setLoadPC(n) {
+  loadPC = n;
+  document.getElementById('btn-pc1').classList.toggle('active', n === 1);
+  document.getElementById('btn-pc2').classList.toggle('active', n === 2);
+  renderLoadings();
+}
+function renderLoadings() {
+  document.getElementById('loadings-bars').innerHTML = LOADINGS.map(r => {
+    const v = loadPC === 1 ? r.pc1 : r.pc2;
+    const pct = Math.abs(v) * 48;
+    const left = v >= 0 ? 50 : 50 - pct;
+    const col = v >= 0 ? (loadPC === 1 ? '#2563eb' : '#7c3aed') : '#dc2626';
+    return `
+      <div class="bar-row">
+        <div style="font-weight:700;">${r.s}</div>
+        <div class="bar-track">
+          <div class="bar-zero"></div>
+          <div class="bar-fill" style="left:${left}%; width:${pct}%; background:${col};"></div>
+        </div>
+        <div class="bar-val" style="color:${col}">${v >= 0 ? '+' : ''}${v.toFixed(3)}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('loadings-note').innerHTML = loadPC === 1
+    ? (LANG === 'en'
+        ? '<b>PC1 = Common Inflation Wave:</b> All 6 price series have almost equal positive weights (+0.38 to +0.44). Why is CZK/EUR negative (−0.19)? Because during the 2022–2023 inflation peak, high central bank interest rates actually made the currency stronger while prices surged!'
+        : '<b>PC1 = Společná inflační vlna:</b> Všech 6 cenových řad má téměř stejnou kladnou váhu (+0,38 až +0,44). Proč má CZK/EUR zápornou váhu (−0,19)? Protože během inflační vlny 2022–2023 koruna díky vysokým úrokovým sazbám spíš posilovala, zatímco všechny ceny prudce rostly!')
+    : (LANG === 'en'
+        ? '<b>PC2 = Exchange-Rate Channel:</b> Dominated by CZK/EUR (+0.94) plus imported industrial goods (+0.32), while all other prices sit near zero. It captures weaker-currency pressure on goods even when domestic prices are calm.'
+        : '<b>PC2 = Kurzová složka:</b> Jasně ji táhne kurz CZK/EUR (+0,94) a zčásti průmyslové zboží (+0,32), zatímco ostatní ceny jsou blízko nuly. Ukazuje tlak slabší koruny na dovážené zboží.');
+}
+
+let cmpMode = 'hicp';
+function setCmpMode(m) {
+  cmpMode = m;
+  document.getElementById('btn-cmp-hicp').classList.toggle('active', m === 'hicp');
+  document.getElementById('btn-cmp-rob').classList.toggle('active', m === 'rob');
+  renderComparison();
+}
+function renderComparison() {
+  const c = document.getElementById('canvas-cmp');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const N = 120; // 2006 to 2026 stylized
+  const pc1 = Array.from({ length: N }, (_, i) => {
+    const yr = 2006 + (i / (N - 1)) * 20;
+    let v = -0.2;
+    v += 1.0 * Math.exp(-Math.pow((yr - 2008.4) / 0.7, 2));
+    v -= 1.1 * Math.exp(-Math.pow((yr - 2009.6) / 0.8, 2));
+    v -= 0.7 * Math.exp(-Math.pow((yr - 2015.0) / 1.6, 2));
+    v += 4.15 * Math.exp(-Math.pow((yr - 2022.7) / 1.05, 2));
+    v += 0.12 * Math.sin(i * 0.45);
+    return v;
+  });
+  const second = pc1.map((v, i) => cmpMode === 'hicp'
+    ? v * 0.96 + 0.18 * Math.sin(i * 0.35 + 1)
+    : (i < 54 ? null : v * 1.01 + 0.05 * Math.cos(i * 0.5)));
+
+  const padL = 44, padR = 16, padT = 18, padB = 26;
+  const pw = W - padL - padR, ph = H - padT - padB;
+  const minV = -1.8, maxV = 4.4;
+
+  ctx.strokeStyle = '#e5edf7'; ctx.lineWidth = 1;
+  [-1, 0, 1, 2, 3, 4].forEach(val => {
+    const y = padT + ((maxV - val) / (maxV - minV)) * ph;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+    ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif'; ctx.fillText((val > 0 ? '+' : '') + val + ' sd', 4, y + 4);
+  });
+
+  // Draw PC1
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.6; ctx.beginPath();
+  pc1.forEach((v, i) => {
+    const x = padL + (i / (N - 1)) * pw;
+    const y = padT + ((maxV - v) / (maxV - minV)) * ph;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Draw comparison
+  ctx.strokeStyle = cmpMode === 'hicp' ? '#dc2626' : '#0d9488';
+  ctx.setLineDash([6, 4]); ctx.lineWidth = 2.4; ctx.beginPath();
+  let started = false;
+  second.forEach((v, i) => {
+    if (v === null) return;
+    const x = padL + (i / (N - 1)) * pw;
+    const y = padT + ((maxV - v) / (maxV - minV)) * ph;
+    if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Year labels
+  ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif';
+  [2006, 2009, 2012, 2015, 2018, 2022, 2026].forEach(yr => {
+    const x = padL + ((yr - 2006) / 20) * pw;
+    ctx.fillText(String(yr), x - 12, H - 7);
+  });
+}
+
+/* ==================== 6. EVIEWS DECODER ==================== */
+const EVIEWS = [
+  {
+    code: 'wfcreate(wf=pca_idx) m 2006m01 2026m09',
+    en: 'Creates a new monthly (<code>m</code>) EViews workfile spanning January 2006 to September 2026 (249 monthly observations).',
+    cz: 'Vytvoří nový měsíční (<code>m</code>) pracovní soubor v EViews od ledna 2006 do září 2026 (249 měsíčních pozorování).'
+  },
+  {
+    code: 'freeze(adf_food) food.uroot(adf, exog=const, lagmethod=sic)',
+    en: 'Runs an Augmented Dickey-Fuller unit-root test on <code>food</code> with a constant (<code>exog=const</code>) and automatic lag selection via Schwarz criterion (<code>sic</code>), saving the table as <code>adf_food</code>.',
+    cz: 'Spustí rozšířený Dickey-Fullerův (ADF) test na řadě <code>food</code> s konstantou (<code>exog=const</code>) a automatickým výběrem zpoždění podle Schwarzova kritéria (<code>sic</code>) a uloží tabulku jako <code>adf_food</code>.'
+  },
+  {
+    code: 'series food_n = (food - @mean(food)) / @stdev(food)',
+    en: 'Standardizes <code>food</code> into a z-score with mean 0 and standard deviation 1 so every series enters PCA on equal footing.',
+    cz: 'Standardizuje řadu <code>food</code> na z-skóre s průměrem 0 a směrodatnou odchylkou 1, aby všechny řady vstupovaly do PCA se stejným měřítkem.'
+  },
+  {
+    code: 'freeze(pca_tab) g_norm.pcomp(out=table)',
+    en: 'Computes Principal Components on the group of standardized series <code>g_norm</code> and saves the eigenvalues &amp; loadings table.',
+    cz: 'Spočítá hlavní komponenty ze skupiny standardizovaných řad <code>g_norm</code> a uloží tabulku vlastních čísel a zátěží.'
+  },
+  {
+    code: 'g_norm.makepcomp pc1 pc2',
+    en: 'Generates the actual time series <code>pc1</code> and <code>pc2</code> in the workfile so you can plot and correlate them.',
+    cz: 'Vygeneruje samotné časové řady <code>pc1</code> a <code>pc2</code> do pracovního souboru, aby šly vykreslit a porovnat.'
+  },
+  {
+    code: 'if @cor(pc1, hicp) < 0 then pc1 = -pc1 endif',
+    en: 'Fixes the arbitrary sign of PC1: if PC1 moves opposite to headline inflation, multiply by −1 so positive values always mean higher inflation.',
+    cz: 'Opraví libovolné znaménko PC1: pokud se PC1 hýbe opačně než celková inflace, vynásobí ho −1, aby kladné hodnoty vždy znamenaly vyšší inflaci.'
+  },
+  {
+    code: 'series pc1_std = pc1 / @stdev(pc1)',
+    en: 'Rescales PC1 to standard deviation 1 (its mean is already 0), making values directly readable in standard deviations (e.g. +3.95 sd at peak).',
+    cz: 'Přeškáluje PC1 na směrodatnou odchylku 1 (průměr už je 0), takže hodnoty čteš přímo ve směrodatných odchylkách (např. +3,95 sd na vrcholu).'
+  }
+];
+let activeEv = 0;
+function renderEViews() {
+  document.getElementById('eviews-list').innerHTML = EVIEWS.map((e, i) => `
+    <button class="code-item ${i === activeEv ? 'active' : ''}" onclick="activeEv=${i};renderEViews()">${e.code}</button>
+  `).join('');
+  const cur = EVIEWS[activeEv];
+  document.getElementById('eviews-detail').innerHTML = `
+    <div style="font-size:11.5px; font-weight:800; color:var(--accent); text-transform:uppercase; margin-bottom:6px;">
+      ${LANG === 'en' ? 'Plain-Language Breakdown' : 'Vysvětlení lidskou řečí'}
+    </div>
+    <pre style="margin:0 0 12px; padding:10px 12px; background:#0f172a; color:#38bdf8; border-radius:8px; overflow-x:auto; font-size:12.5px;">${cur.code}</pre>
+    <div style="font-size:14.5px;">${LANG === 'en' ? cur.en : cur.cz}</div>
+  `;
+}
+
+/* ==================== 7. FLASHCARDS ==================== */
+const CARDS = [
+  {
+    qEn: 'Why did you NOT run X-12 / X-13 seasonal adjustment?',
+    aEn: 'Every input is already a year-on-year % change (comparing the same calendar month with a year earlier), which removes most regular seasonal swings automatically.',
+    qCz: 'Proč jsi nedělala sezónní očištění X-12 / X-13?',
+    aCz: 'Všechny řady jsou už v meziročních % změnách (porovnávají stejný měsíc s loňským rokem), takže pravidelné roční sezónní výkyvy se z velké části samy odečtou.'
+  },
+  {
+    qEn: '3 of 7 series failed the ADF test at 5%. Why keep levels instead of differencing?',
+    aEn: 'A 20-year sample with one massive 2021–2023 wave lowers ADF power, even though y/y inflation fluctuates around a stable target (~2%). Differencing would change the index from "inflation pressure" into "speed of change of inflation".',
+    qCz: '3 ze 7 řad neprošly ADF testem na 5 %. Proč jsi je nediferencovala?',
+    aCz: 'Jedna mimořádná inflační vlna (2021–2023) ve dvacetiletém vzorku snižuje sílu ADF testu, i když meziroční inflace dlouhodobě kolísá kolem cíle (~2 %). Diferencování by navíc změnilo význam z "síly inflačního tlaku" na "zrychlování/zpomalování inflace".'
+  },
+  {
+    qEn: 'Why did you exclude core inflation from the PCA?',
+    aEn: 'Core inflation is just a weighted average of services and non-energy goods, which are already in the model. Adding it would double-count those prices and bias the PCA weights.',
+    qCz: 'Proč jsi do PCA nedala jádrovou inflaci (core)?',
+    aCz: 'Jádrová inflace je v podstatě jen vážený průměr služeb a zboží, které už v PCA mám. Její přidání by tyto ceny započítalo dvakrát a zkreslilo váhy.'
+  },
+  {
+    qEn: 'Why did you standardize all series first?',
+    aEn: 'PCA maximizes variance. Without z-scoring (mean 0, sd 1), volatile energy (±40%) and PPI would dominate PC1 while calmer services (±5%) would be ignored.',
+    qCz: 'Proč jsi řady před PCA standardizovala?',
+    aCz: 'PCA maximalizuje rozptyl. Bez standardizace na průměr 0 a sd 1 by rozkolísané energie (±40 %) a PPI ovládly celé PC1 a pomalejší služby by zanikly.'
+  },
+  {
+    qEn: 'Why is the exchange-rate weight negative (−0.19) in PC1?',
+    aEn: 'During the 2022–2023 inflation surge, high domestic interest rates strengthened the koruna (negative y/y CZK/EUR) at the exact moment all price series spiked upward.',
+    qCz: 'Proč má kurz CZK/EUR v PC1 zápornou váhu (−0,19)?',
+    aCz: 'Během hlavní inflační vlny 2022–2023 koruna díky vysokým úrokovým sazbám posilovala (záporná meziroční změna CZK/EUR), zatímco všechny cenové řady prudce rostly.'
+  },
+  {
+    qEn: 'Is it legal to flip the sign of PC1 (pc1 = -pc1)?',
+    aEn: 'Yes! An eigenvector defines a line, not a direction — multiplying by −1 leaves variance explained and correlation magnitudes 100% identical, while ensuring "up" means higher inflation.',
+    qCz: 'Můžeš jen tak otočit znaménko PC1 (pc1 = -pc1)?',
+    aCz: 'Ano! Vlastní vektor určuje přímku, ne směr — vynásobení −1 vůbec nezmění vysvětlený rozptyl ani sílu vztahů, jen zajistí, že růst indexu znamená vyšší inflaci.'
+  },
+  {
+    qEn: 'What does PC2 represent and why keep only PC1 as the index?',
+    aEn: 'PC1 alone explains 69.3% (eigenvalue 4.85 > 1) and reflects broad inflation pressure. PC2 (12.9%, eigenvalue 0.91 < 1) is mainly the exchange-rate factor (weight 0.94 on CZK/EUR).',
+    qCz: 'Co znamená PC2 a proč stačí PC1 jako hlavní index?',
+    aCz: 'PC1 samo vysvětlí 69,3 % rozptylu (vlastní číslo 4,85 > 1) a měří plošný inflační tlak. PC2 (12,9 %, vlastní číslo 0,91 < 1) zachycuje hlavně kurzovou složku (váha 0,94 u CZK/EUR).'
+  },
+  {
+    qEn: 'How do you know the index actually works?',
+    aEn: 'Two independent checks: (1) correlation r = 0.976 with excluded headline HICP, and (2) adding import prices on 2015–2026 gives r = 0.996 with the main PC1.',
+    qCz: 'Jak víš, že výsledný index opravdu funguje?',
+    aCz: 'Dvě nezávislé kontroly: (1) korelace r = 0,976 s celkovou inflací HICP (která v PCA nebyla) a (2) kontrola robustnosti s dovozními cenami od 2015 dává korelaci r = 0,996 s hlavním PC1.'
+  }
+];
+function renderFlashcards() {
+  const wrap = document.getElementById('flashcards');
+  const openSet = new Set([...wrap.querySelectorAll('.fc.open')].map(el => Number(el.dataset.idx)));
+  wrap.innerHTML = CARDS.map((c, i) => `
+    <div class="fc ${openSet.has(i) ? 'open' : ''}" data-idx="${i}" onclick="this.classList.toggle('open')">
+      <div class="fc-q">
+        <span>${LANG === 'en' ? c.qEn : c.qCz}</span>
+        <span class="fc-tag">${LANG === 'en' ? 'Tap' : 'Odkrýt'}</span>
+      </div>
+      <div class="fc-a">${LANG === 'en' ? c.aEn : c.aCz}</div>
+    </div>
+  `).join('');
+}
+
+// Initial render
+setLang('en');
+</script>
+</body>
+</html>
