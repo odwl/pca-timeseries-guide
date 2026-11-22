@@ -529,6 +529,200 @@
     font-size: 12.5px;
     margin-top: 36px;
   }
+
+  /* Inline Comments Drawer & Highlight Pill */
+  .cmt-top-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cmt-top-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .cmt-badge {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 800;
+    min-width: 20px;
+    text-align: center;
+  }
+  .sec-cmt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--muted);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .sec-cmt-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .sec-cmt-btn.has-items { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-soft); }
+
+  #sel-pill {
+    position: fixed;
+    z-index: 90;
+    display: none;
+    background: #0f172a;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.28);
+  }
+  #sel-pill:hover { background: var(--accent); }
+
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.28);
+    z-index: 70;
+    display: none;
+  }
+  .drawer-backdrop.open { display: block; }
+  .drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(410px, 94vw);
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    box-shadow: -8px 0 30px rgba(15, 23, 42, 0.14);
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.22s ease;
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-head {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .drawer-form {
+    border-top: 1px solid var(--border);
+    padding: 14px 16px;
+    background: var(--surface-2);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .drawer-form select, .drawer-form textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 8px 10px;
+    font: inherit;
+    font-size: 13.5px;
+    background: #fff;
+    color: var(--text);
+  }
+  .drawer-form textarea { min-height: 76px; resize: vertical; }
+  .quote-preview {
+    font-size: 12.5px;
+    background: #fff;
+    border-left: 3px solid var(--accent);
+    padding: 6px 9px;
+    border-radius: 0 7px 7px 0;
+    color: var(--muted);
+    display: none;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .cmt-card {
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 11px 12px;
+    background: #fcfdff;
+  }
+  .cmt-card.resolved { opacity: 0.65; }
+  .cmt-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .cmt-sec-tag {
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .cmt-quote {
+    font-size: 12px;
+    color: var(--muted);
+    border-left: 3px solid #cbd5e1;
+    padding: 3px 8px;
+    margin: 4px 0 6px;
+    font-style: italic;
+  }
+  .cmt-text { font-size: 13.5px; white-space: pre-wrap; }
+  .cmt-replies {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cmt-reply {
+    font-size: 13px;
+    padding: 6px 9px;
+    border-radius: 8px;
+    background: var(--surface-2);
+  }
+  .cmt-reply.guide {
+    background: var(--teal-soft);
+    border-left: 3px solid var(--teal);
+  }
+  .cmt-reply-form {
+    display: flex;
+    gap: 6px;
+    margin-top: 7px;
+  }
+  .cmt-reply-form input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 12.5px;
+  }
 </style>
 </head>
 <body class="lang-en">
@@ -549,9 +743,17 @@
       <a href="#sec-eviews"><span class="en">EViews</span><span class="cz">EViews</span></a>
       <a href="#sec-quiz"><span class="en">Q&amp;A Cards</span><span class="cz">Otázky</span></a>
     </nav>
-    <div class="lang-toggle" role="group" aria-label="Language">
-      <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
-      <button id="btn-cz" onclick="setLang('cz')">CZ</button>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button class="cmt-top-btn" onclick="openDrawer()" aria-label="Open comments">
+        <span>💬</span>
+        <span class="en">Comments</span>
+        <span class="cz">Komentáře</span>
+        <span class="cmt-badge" id="cmt-total-badge">0</span>
+      </button>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
+        <button id="btn-cz" onclick="setLang('cz')">CZ</button>
+      </div>
     </div>
   </div>
 </header>
@@ -916,10 +1118,50 @@
   </section>
 
   <div class="footer">
-    <span class="en">Self-contained interactive study guide · Works offline in any browser</span>
-    <span class="cz">Samostatný interaktivní studijní průvodce · Funguje v každém prohlížeči</span>
+    <span class="en">Self-contained interactive study guide · Highlight any text or click 💬 on any section to leave a question</span>
+    <span class="cz">Interaktivní studijní průvodce · Označ libovolný text nebo klikni na 💬 u jakékoliv sekce a nech otázku</span>
   </div>
 </main>
+
+<!-- Floating text-highlight pill -->
+<button id="sel-pill" onmousedown="event.preventDefault()" onclick="commentOnSelection()">
+  <span class="en">💬 Ask about this</span>
+  <span class="cz">💬 Zeptat se na tohle</span>
+</button>
+
+<!-- Right-hand Comments Drawer -->
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+<aside class="drawer" id="cmt-drawer" aria-label="Comments">
+  <div class="drawer-head">
+    <div>
+      <strong style="font-size:16px;">
+        <span class="en">💬 Questions &amp; Comments</span>
+        <span class="cz">💬 Otázky a komentáře</span>
+      </strong>
+      <div style="font-size:12px; color:var(--muted);">
+        <span class="en">No login needed · Saved privately</span>
+        <span class="cz">Bez přihlášení · Uloženo soukromě</span>
+      </div>
+    </div>
+    <button class="btn" style="padding:5px 10px;" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="cmt-list"></div>
+  <form class="drawer-form" onsubmit="submitComment(event)">
+    <select id="cmt-sec-select"></select>
+    <div class="quote-preview" id="cmt-quote-box">
+      <span id="cmt-quote-text"></span>
+      <button type="button" style="border:none;background:none;cursor:pointer;color:var(--muted);font-weight:700;" onclick="clearQuote()">✕</button>
+    </div>
+    <textarea id="cmt-input" placeholder="Ask a question or mark what feels unclear..."></textarea>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+      <span id="cmt-status" style="font-size:12px; color:var(--muted);"></span>
+      <button type="submit" class="btn btn-primary" id="cmt-submit-btn">
+        <span class="en">Post comment</span>
+        <span class="cz">Odeslat</span>
+      </button>
+    </div>
+  </form>
+</aside>
 
 <script>
 let LANG = 'en';
@@ -940,6 +1182,7 @@ function setLang(l) {
   renderComparison();
   renderEViews();
   renderFlashcards();
+  if (typeof renderCommentsUI === 'function') renderCommentsUI();
 }
 
 /* ==================== 1. PIPELINE ==================== */
@@ -1666,8 +1909,240 @@ function renderFlashcards() {
   `).join('');
 }
 
+/* ==================== 8. INLINE COMMENTS (PRIVATE BACKEND) ==================== */
+const CMT_API = 'https://study-notes-api-xrriblun7a-oa.a.run.app';
+const PAGE_SLUG = 'pca-timeseries-guide';
+let COMMENTS = [];
+let PENDING_QUOTE = '';
+let LAST_SEL_SEC = 'sec-pipeline';
+
+const SEC_META = [
+  { id: 'sec-pipeline',    en: 'Step 1 · Pipeline & Core',       cz: 'Krok 1 · Postup a Core' },
+  { id: 'sec-seasonality', en: 'Step 2 · Seasonality & ADF',     cz: 'Krok 2 · Sezónnost & ADF' },
+  { id: 'sec-standardize', en: 'Step 3 · Standardization',       cz: 'Krok 3 · Standardizace' },
+  { id: 'sec-pca-geom',    en: 'Step 4 · PCA Geometry',          cz: 'Krok 4 · Geometrie PCA' },
+  { id: 'sec-loadings',    en: 'Step 5 · Scree & Loadings',      cz: 'Krok 5 · Scree a zátěže' },
+  { id: 'sec-eviews',      en: 'Step 6 · EViews Commands',       cz: 'Krok 6 · EViews příkazy' },
+  { id: 'sec-quiz',        en: 'Step 7 · Q&A Flashcards',        cz: 'Krok 7 · Otázky a odpovědi' }
+];
+
+function escHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function initSectionButtons() {
+  SEC_META.forEach(m => {
+    const sec = document.getElementById(m.id);
+    if (!sec) return;
+    const head = sec.querySelector('.sec-head');
+    if (!head || head.querySelector('.sec-cmt-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'sec-cmt-btn';
+    btn.dataset.secId = m.id;
+    btn.onclick = () => openDrawer(m.id);
+    head.appendChild(btn);
+  });
+}
+
+function renderCommentsUI() {
+  initSectionButtons();
+  const openCount = COMMENTS.filter(c => c.status !== 'resolved').length;
+  const badge = document.getElementById('cmt-total-badge');
+  if (badge) badge.textContent = String(openCount);
+
+  document.querySelectorAll('.sec-cmt-btn').forEach(btn => {
+    const sid = btn.dataset.secId;
+    const n = COMMENTS.filter(c => c.section_id === sid && c.status !== 'resolved').length;
+    btn.classList.toggle('has-items', n > 0);
+    btn.textContent = n > 0
+      ? `💬 ${n} ${LANG === 'en' ? (n === 1 ? 'comment' : 'comments') : (n === 1 ? 'komentář' : 'komentáře')}`
+      : (LANG === 'en' ? '💬 Ask / Comment' : '💬 Zeptat se');
+  });
+
+  const sel = document.getElementById('cmt-sec-select');
+  if (sel) {
+    const cur = sel.value || LAST_SEL_SEC;
+    sel.innerHTML = SEC_META.map(m => `<option value="${m.id}">${LANG === 'en' ? m.en : m.cz}</option>`).join('');
+    sel.value = cur;
+  }
+  const inp = document.getElementById('cmt-input');
+  if (inp) {
+    inp.placeholder = LANG === 'en'
+      ? 'Ask a question or write what you want explained more...'
+      : 'Napiš otázku nebo co chceš víc vysvětlit...';
+  }
+
+  const list = document.getElementById('cmt-list');
+  if (!list) return;
+  if (!COMMENTS.length) {
+    list.innerHTML = `<div style="text-align:center; color:var(--muted); padding:28px 12px; font-size:13.5px;">
+      ${LANG === 'en'
+        ? 'No comments yet. Highlight any sentence on the page or type a question below!'
+        : 'Zatím žádné komentáře. Označ jakoukoliv větu na stránce nebo napiš otázku dolů!'}
+    </div>`;
+    return;
+  }
+  list.innerHTML = COMMENTS.map(c => {
+    const sm = SEC_META.find(m => m.id === c.section_id);
+    const secLabel = sm ? (LANG === 'en' ? sm.en : sm.cz) : (c.section_title || 'General');
+    const dateStr = (c.created_at || '').slice(0, 16).replace('T', ' ');
+    const reps = (c.replies || []).map(r => `
+      <div class="cmt-reply ${r.author === 'guide' ? 'guide' : ''}">
+        <div style="font-size:11px; font-weight:700; color:var(--muted); margin-bottom:2px;">
+          ${r.author === 'guide' ? (LANG === 'en' ? 'Answer' : 'Odpověď') : (LANG === 'en' ? 'Follow-up' : 'Doplnění')}
+        </div>
+        <div>${escHtml(r.text)}</div>
+      </div>
+    `).join('');
+    return `
+      <div class="cmt-card ${c.status === 'resolved' ? 'resolved' : ''}">
+        <div class="cmt-meta">
+          <span class="cmt-sec-tag">${escHtml(secLabel)}</span>
+          <span>${escHtml(dateStr)}${c.status === 'resolved' ? ' · ✓' : ''}</span>
+        </div>
+        ${c.quote ? `<div class="cmt-quote">“${escHtml(c.quote)}”</div>` : ''}
+        <div class="cmt-text">${escHtml(c.text)}</div>
+        ${reps ? `<div class="cmt-replies">${reps}</div>` : ''}
+        <form class="cmt-reply-form" onsubmit="submitReply(event, '${escHtml(c.id)}')">
+          <input type="text" placeholder="${LANG === 'en' ? 'Reply...' : 'Odpovědět...'}" />
+          <button type="submit" class="btn" style="padding:4px 9px; font-size:12px;">↵</button>
+        </form>
+      </div>
+    `;
+  }).join('');
+}
+
+function openDrawer(secId, quote) {
+  if (secId) LAST_SEL_SEC = secId;
+  if (typeof quote === 'string') {
+    PENDING_QUOTE = quote.trim().slice(0, 350);
+    const box = document.getElementById('cmt-quote-box');
+    document.getElementById('cmt-quote-text').textContent = PENDING_QUOTE ? '“' + PENDING_QUOTE + '”' : '';
+    box.style.display = PENDING_QUOTE ? 'flex' : 'none';
+  }
+  renderCommentsUI();
+  if (secId) document.getElementById('cmt-sec-select').value = secId;
+  document.getElementById('drawer-backdrop').classList.add('open');
+  document.getElementById('cmt-drawer').classList.add('open');
+  setTimeout(() => document.getElementById('cmt-input').focus(), 180);
+}
+
+function closeDrawer() {
+  document.getElementById('drawer-backdrop').classList.remove('open');
+  document.getElementById('cmt-drawer').classList.remove('open');
+}
+
+function clearQuote() {
+  PENDING_QUOTE = '';
+  document.getElementById('cmt-quote-box').style.display = 'none';
+}
+
+async function loadComments() {
+  try {
+    const r = await fetch(`${CMT_API}/api/comments?page=${encodeURIComponent(PAGE_SLUG)}`);
+    if (!r.ok) return;
+    const data = await r.json();
+    COMMENTS = data.comments || [];
+    renderCommentsUI();
+  } catch (e) { /* offline fallback */ }
+}
+
+async function submitComment(ev) {
+  ev.preventDefault();
+  const inp = document.getElementById('cmt-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  const secId = document.getElementById('cmt-sec-select').value;
+  const sm = SEC_META.find(m => m.id === secId);
+  const st = document.getElementById('cmt-status');
+  const btn = document.getElementById('cmt-submit-btn');
+  btn.disabled = true;
+  st.textContent = LANG === 'en' ? 'Saving...' : 'Ukládám...';
+  try {
+    const r = await fetch(`${CMT_API}/api/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        page: PAGE_SLUG,
+        section_id: secId,
+        section_title: sm ? sm.en : '',
+        quote: PENDING_QUOTE,
+        text
+      })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const created = await r.json();
+    COMMENTS.push(created);
+    inp.value = '';
+    clearQuote();
+    st.textContent = LANG === 'en' ? 'Saved!' : 'Uloženo!';
+    renderCommentsUI();
+    setTimeout(() => { st.textContent = ''; }, 2000);
+  } catch (e) {
+    st.textContent = LANG === 'en' ? 'Could not save — try again.' : 'Nepodařilo se uložit.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function submitReply(ev, cid) {
+  ev.preventDefault();
+  const inp = ev.target.querySelector('input');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.disabled = true;
+  try {
+    const r = await fetch(`${CMT_API}/api/comments/${encodeURIComponent(cid)}/reply`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const target = COMMENTS.find(c => c.id === cid);
+    if (target) {
+      target.replies = target.replies || [];
+      target.replies.push(data.reply);
+      target.status = 'open';
+    }
+    inp.value = '';
+    renderCommentsUI();
+  } catch (e) { /* ignore */ } finally {
+    inp.disabled = false;
+  }
+}
+
+function commentOnSelection() {
+  const pill = document.getElementById('sel-pill');
+  pill.style.display = 'none';
+  const txt = (window.getSelection() || '').toString().trim();
+  if (!txt) return;
+  openDrawer(LAST_SEL_SEC, txt);
+}
+
+document.addEventListener('mouseup', () => {
+  const pill = document.getElementById('sel-pill');
+  const sel = window.getSelection();
+  const txt = sel ? sel.toString().trim() : '';
+  if (!txt || txt.length < 3 || document.getElementById('cmt-drawer').classList.contains('open')) {
+    pill.style.display = 'none';
+    return;
+  }
+  const range = sel.getRangeAt(0);
+  let node = range.commonAncestorContainer;
+  if (node.nodeType === 3) node = node.parentElement;
+  const sec = node && node.closest ? node.closest('section[id]') : null;
+  if (!sec) { pill.style.display = 'none'; return; }
+  LAST_SEL_SEC = sec.id;
+  const rect = range.getBoundingClientRect();
+  pill.style.left = Math.max(12, Math.min(window.innerWidth - 170, rect.left + rect.width / 2 - 75)) + 'px';
+  pill.style.top = Math.max(58, rect.top - 40) + 'px';
+  pill.style.display = 'block';
+});
+
 // Initial render
 setLang('en');
+loadComments();
 </script>
 </body>
 </html>
