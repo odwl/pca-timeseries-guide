@@ -894,6 +894,38 @@
           <div class="callout amber" id="adf-note"></div>
         </div>
       </div>
+
+      <!-- Mini visual explainer: What is a Unit Root? -->
+      <div style="margin-top:18px; padding-top:16px; border-top:1px solid var(--border);">
+        <div class="controls" style="justify-content:space-between;">
+          <div>
+            <strong>
+              <span class="en">Wait — what does "Unit Root" actually mean?</span>
+              <span class="cz">Počkat — co vlastně znamená „jednotkový kořen“ (unit root)?</span>
+            </strong>
+            <div style="font-size:13px; color:var(--muted);">
+              <span class="en">Think of <code>x_t = φ · x_{t-1} + shock</code>. Toggle <code>φ</code> below to see what happens after one shock hits the economy:</span>
+              <span class="cz">Představ si vztah <code>x_t = φ · x_{t-1} + šok</code>. Přepni <code>φ</code> níže a sleduj, co se stane po jednom šoku v ekonomice:</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button id="btn-ur-stat" class="btn active" onclick="setUrMode('stat')">
+              <span class="en">φ = 0.80 (Stationary — fades back)</span>
+              <span class="cz">φ = 0,80 (Stacionární — vrací se)</span>
+            </button>
+            <button id="btn-ur-unit" class="btn" onclick="setUrMode('unit')">
+              <span class="en">φ = 1.00 (Unit Root — wanders forever)</span>
+              <span class="cz">φ = 1,00 (Jednotkový kořen — ujíždí)</span>
+            </button>
+          </div>
+        </div>
+        <div class="grid-2" style="align-items:center;">
+          <div class="viz-box">
+            <canvas id="canvas-ur" width="500" height="165"></canvas>
+          </div>
+          <div class="callout" id="ur-explain" style="margin-top:0;"></div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1175,6 +1207,7 @@ function setLang(l) {
   renderCoreDemo();
   renderSeasonality();
   renderADF();
+  renderUnitRoot();
   renderStandardize();
   renderGeom();
   renderScree();
@@ -1449,6 +1482,58 @@ function renderADF() {
         : (LANG === 'en'
             ? '<b>Normal times (small shock):</b> Without a massive one-off spike, ADF clearly confirms the series reverts to its long-run mean (t &lt; −2.87). Try dragging the shock slider up!'
             : '<b>Klidné období (malý šok):</b> Bez extrémní vlny ADF test jasně potvrdí návrat k průměru (t &lt; −2,87). Zkus posuvník vlny vytáhnout doprava!'));
+}
+
+let urMode = 'stat';
+function setUrMode(m) {
+  urMode = m;
+  document.getElementById('btn-ur-stat').classList.toggle('active', m === 'stat');
+  document.getElementById('btn-ur-unit').classList.toggle('active', m === 'unit');
+  renderUnitRoot();
+}
+function renderUnitRoot() {
+  const c = document.getElementById('canvas-ur');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+  const phi = urMode === 'stat' ? 0.80 : 1.00;
+  const N = 60;
+  const vals = [2.0];
+  for (let t = 1; t < N; t++) {
+    const shock = (t === 15 ? 4.0 : 0) + (t === 36 ? 2.5 : 0) + 0.35 * Math.sin(t * 2.1);
+    vals.push(urMode === 'stat' ? 2.0 + phi * (vals[t - 1] - 2.0) + shock : vals[t - 1] + shock);
+  }
+  const padL = 36, padR = 14, padT = 14, padB = 22;
+  const pw = W - padL - padR, ph = H - padT - padB;
+  const minV = 0, maxV = 11;
+
+  // Baseline 2%
+  const yBase = padT + ((maxV - 2.0) / (maxV - minV)) * ph;
+  ctx.setLineDash([5, 4]); ctx.strokeStyle = '#94a3b8';
+  ctx.beginPath(); ctx.moveTo(padL, yBase); ctx.lineTo(W - padR, yBase); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.strokeStyle = urMode === 'stat' ? '#0d9488' : '#dc2626';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  vals.forEach((v, i) => {
+    const x = padL + (i / (N - 1)) * pw;
+    const y = padT + ((maxV - Math.min(maxV, Math.max(minV, v))) / (maxV - minV)) * ph;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif';
+  ctx.fillText('mean', 2, yBase + 4);
+
+  document.getElementById('ur-explain').innerHTML = urMode === 'stat'
+    ? (LANG === 'en'
+        ? '<b>No unit root (φ = 0.80 &lt; 1):</b> When a shock hits at month 15, only 80% of it survives next month, then 64%, then 51%... The series has a "rubber band" pulling it back to its average. That is what <b>stationary</b> means!'
+        : '<b>Bez jednotkového kořene (φ = 0,80 &lt; 1):</b> Když v 15. měsíci přijde šok, příští měsíc z něj zůstane 80 %, pak 64 %, pak 51 %... Řada má „gumičku“, která ji vrací zpět k průměru. Přesně to znamená <b>stacionární</b>!')
+    : (LANG === 'en'
+        ? '<b>Unit root (φ = 1.00):</b> "Unit" literally means 1! 100% of every shock stays in the series forever — no rubber band, so it drifts away like a random walk. The <b>ADF test</b> checks whether φ = 1 (unit root) can be rejected in favor of φ &lt; 1.'
+        : '<b>Jednotkový kořen (φ = 1,00):</b> „Jednotkový“ znamená doslova rovný 1! Celých 100 % každého šoku zůstane v řadě napořád — žádná gumička, řada ujíždí jako náhodná procházka. <b>ADF test</b> testuje, jestli můžeme φ = 1 zamítnout ve prospěch φ &lt; 1.');
 }
 
 /* ==================== 3. STANDARDIZATION ==================== */
