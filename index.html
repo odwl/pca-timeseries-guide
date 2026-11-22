@@ -723,6 +723,68 @@
     padding: 5px 8px;
     font-size: 12.5px;
   }
+
+  /* Glossary */
+  .gloss-search {
+    flex: 1;
+    min-width: 210px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 13.5px;
+    background: var(--surface);
+    color: var(--text);
+  }
+  .gloss-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  @media (max-width: 760px) {
+    .gloss-grid { grid-template-columns: 1fr; }
+  }
+  .gloss-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: #fcfdff;
+  }
+  .gloss-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 5px;
+  }
+  .gloss-term {
+    font-weight: 800;
+    font-size: 14.5px;
+    color: var(--text);
+  }
+  .gloss-cat {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .gloss-def {
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .gloss-formula {
+    margin-top: 6px;
+    display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    padding: 2px 7px;
+    border-radius: 6px;
+  }
 </style>
 </head>
 <body class="lang-en">
@@ -742,6 +804,7 @@
       <a href="#sec-loadings"><span class="en">PC1 &amp; PC2</span><span class="cz">PC1 &amp; PC2</span></a>
       <a href="#sec-eviews"><span class="en">EViews</span><span class="cz">EViews</span></a>
       <a href="#sec-quiz"><span class="en">Q&amp;A Cards</span><span class="cz">Otázky</span></a>
+      <a href="#sec-glossary"><span class="en">Glossary</span><span class="cz">Slovníček</span></a>
     </nav>
     <div style="display:flex; align-items:center; gap:8px;">
       <button class="cmt-top-btn" onclick="openDrawer()" aria-label="Open comments">
@@ -1149,6 +1212,34 @@
     </div>
   </section>
 
+  <!-- SECTION 8: GLOSSARY -->
+  <section id="sec-glossary">
+    <div class="card">
+      <div class="sec-head">
+        <div>
+          <span class="sec-num"><span class="en">Step 8 · Concept Dictionary</span><span class="cz">Krok 8 · Slovníček pojmů</span></span>
+          <h2>
+            <span class="en">Plain-Language Glossary (All Concepts in One Place)</span>
+            <span class="cz">Slovníček lidskou řečí (všechny pojmy na jednom místě)</span>
+          </h2>
+          <p class="lead">
+            <span class="en">Quick intuition for every statistical and econometric term used in this guide — search or filter by topic.</span>
+            <span class="cz">Rychlé a srozumitelné vysvětlení každého statistického a ekonometrického pojmu v tomto průvodci — hledej nebo filtruj podle tématu.</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input id="gloss-search" class="gloss-search" type="search" placeholder="Search a concept (e.g. unit root, eigenvalue, SIC)..." oninput="renderGlossary()">
+        <button class="btn active" id="gcat-all" onclick="setGlossCat('all')"><span class="en">All (20)</span><span class="cz">Všechny (20)</span></button>
+        <button class="btn" id="gcat-ts" onclick="setGlossCat('ts')"><span class="en">Time Series</span><span class="cz">Časové řady</span></button>
+        <button class="btn" id="gcat-pca" onclick="setGlossCat('pca')">PCA</button>
+        <button class="btn" id="gcat-stat" onclick="setGlossCat('stat')"><span class="en">Stats &amp; Macro</span><span class="cz">Statistika &amp; Makro</span></button>
+      </div>
+      <div class="gloss-grid" id="gloss-grid"></div>
+    </div>
+  </section>
+
   <div class="footer">
     <span class="en">Self-contained interactive study guide · Highlight any text or click 💬 on any section to leave a question</span>
     <span class="cz">Interaktivní studijní průvodce · Označ libovolný text nebo klikni na 💬 u jakékoliv sekce a nech otázku</span>
@@ -1215,6 +1306,7 @@ function setLang(l) {
   renderComparison();
   renderEViews();
   renderFlashcards();
+  if (typeof renderGlossary === 'function') renderGlossary();
   if (typeof renderCommentsUI === 'function') renderCommentsUI();
 }
 
@@ -1994,6 +2086,117 @@ function renderFlashcards() {
   `).join('');
 }
 
+/* ==================== 7b. GLOSSARY ==================== */
+const GLOSSARY = [
+  { cat: 'ts', enT: 'Unit Root', czT: 'Jednotkový kořen (Unit Root)', f: 'x_t = 1.0 · x_{t-1} + shock',
+    en: 'Means every shock stays in the series permanently ("unit" = 1). There is no rubber band pulling the series back to an average, so it drifts like a random walk.',
+    cz: 'Znamená, že každý šok zůstane v řadě napořád („jednotkový“ = 1). Neexistuje žádná „gumička“ zpět k průměru, takže řada ujíždí jako náhodná procházka.' },
+  { cat: 'ts', enT: 'Stationarity', czT: 'Stacionarita', f: 'mean & variance constant over time',
+    en: 'A series fluctuates around a stable long-run level without drifting away forever. Shocks fade out over time.',
+    cz: 'Řada kolísá kolem stabilní dlouhodobé úrovně a neujíždí trvale pryč. Šoky postupně vyprchají.' },
+  { cat: 'ts', enT: 'ADF Test (Augmented Dickey-Fuller)', czT: 'ADF test (Rozšířený Dickey-Fullerův test)', f: 'H₀: unit root (φ = 1)',
+    en: 'Statistical test checking whether a series has a unit root. If p-value < 0.05 (or t-stat is more negative than −2.87), we reject the unit root and conclude the series is stationary.',
+    cz: 'Statistický test, který zjišťuje, zda má řada jednotkový kořen. Pokud je p-hodnota < 0,05 (nebo t-stat zápornější než −2,87), jednotkový kořen zamítáme a řada je stacionární.' },
+  { cat: 'stat', enT: 'p-value & 5% Critical Value', czT: 'p-hodnota a 5% kritická hodnota', f: 'p < 0.05  ⟺  t < −2.87',
+    en: 'How surprised we would be to see this data if the null hypothesis (unit root) were true. Below 0.05 (5%) means strong evidence that the series really returns to its mean.',
+    cz: 'Ukazuje, jak moc by nás data překvapila, kdyby platila nulová hypotéza (jednotkový kořen). Pod 0,05 (5 %) znamená silný důkaz, že se řada opravdu vrací k průměru.' },
+  { cat: 'ts', enT: 'Lag Length & Schwarz Criterion (SIC)', czT: 'Počet zpoždění a Schwarzovo kritérium (SIC)', f: 'lagmethod=sic',
+    en: 'ADF adds past changes (lags) so leftover autocorrelation does not fool the test. SIC automatically picks the right number of lags while penalizing unnecessary extra lags.',
+    cz: 'ADF přidává minulé změny (zpoždění), aby zbytková autokorelace nezkreslila test. SIC automaticky vybere správný počet zpoždění a penalizuje zbytečně složitý model.' },
+  { cat: 'ts', enT: 'First Difference d(x)', czT: 'První diference d(x)', f: 'd(x)_t = x_t − x_{t-1}',
+    en: 'The month-to-month change of a series. Differencing removes trends/unit roots, but turns "how high is inflation?" into "is inflation speeding up or slowing down?".',
+    cz: 'Meziměsíční změna řady. Diferencování odstraní trend i jednotkový kořen, ale změní otázku z „jak vysoká je inflace?“ na „zrychluje nebo zpomaluje inflace?“.' },
+  { cat: 'ts', enT: 'Year-on-Year % Change (y/y)', czT: 'Meziroční procentní změna (y/y)', f: '(x_t / x_{t-12} − 1) × 100',
+    en: 'Compares a month with the exact same month one year earlier (e.g. Sept vs. last Sept). Automatically removes most regular calendar seasonality.',
+    cz: 'Porovnává měsíc se stejným měsícem předchozího roku (např. září proti loňskému září). Z velké části automaticky odstraní pravidelnou sezónnost.' },
+  { cat: 'ts', enT: 'Seasonal Adjustment (X-12 / X-13)', czT: 'Sezónní očištění (X-12 / X-13)', f: 'removes repeating calendar humps',
+    en: 'Algorithms used by statistical offices to strip out predictable seasonal patterns (winter heating, holiday shopping) from raw monthly/quarterly levels. Usually not needed once data are already y/y %.',
+    cz: 'Metody statistických úřadů pro odstranění pravidelných sezónních výkyvů ze surových měsíčních/čtvrtletních hladin. U meziročních % změn obvykle není potřeba.' },
+  { cat: 'ts', enT: 'HP Filter & Smoothing Parameter λ', czT: 'HP filtr a vyhlazovací parametr λ', f: 'λ = 1600 (Q), 14400 (M)',
+    en: 'Splits a growing series (like GDP) into a smooth long-run trend and a business cycle. Higher λ = smoother trend. Not needed for inflation rates that already move around a flat target (~2%).',
+    cz: 'Rozdělí rostoucí řadu (třeba HDP) na hladký dlouhodobý trend a hospodářský cyklus. Vyšší λ = hladší trend. U míry inflace, která už kolísá kolem rovného cíle (~2 %), není potřeba.' },
+  { cat: 'stat', enT: 'Standardization (z-score)', czT: 'Standardizace (z-skóre)', f: 'z = (x − mean) / sd',
+    en: 'Shifts every series to mean 0 and scales it to standard deviation 1. Value +2 always means "2 standard deviations above its own long-run average", giving every series an equal vote in PCA.',
+    cz: 'Převede každou řadu na průměr 0 a směrodatnou odchylku 1. Hodnota +2 vždy znamená „2 směrodatné odchylky nad vlastním průměrem“, takže každá řada má v PCA spravedlivou váhu.' },
+  { cat: 'stat', enT: 'Variance & Standard Deviation (sd)', czT: 'Rozptyl a směrodatná odchylka (sd)', f: 'sd = √variance',
+    en: 'Measures how wildly a series swings around its average. Energy has a huge sd (swings ±40%), while services have a small sd (±5%).',
+    cz: 'Měří, jak moc řada kolísá kolem svého průměru. Energie mají obrovskou sd (±40 %), zatímco služby malou (±5 %).' },
+  { cat: 'stat', enT: 'Correlation (r)', czT: 'Korelace (r)', f: '−1 ≤ r ≤ +1',
+    en: 'Measures how closely two series move together in a straight line: +1 = move in lockstep, 0 = unrelated, −1 = move in exact opposite directions. Here r = 0.976 between PC1 and HICP.',
+    cz: 'Měří, jak těsně se dvě řady pohybují společně: +1 = úplně stejně, 0 = bez vztahu, −1 = přesně opačně. Mezi PC1 a HICP je r = 0,976.' },
+  { cat: 'pca', enT: 'Principal Component Analysis (PCA)', czT: 'Analýza hlavních komponent (PCA)', f: 'many series ➔ 1–2 common factors',
+    en: 'Compresses many correlated indicators into a few new summary series (PC1, PC2, ...) ordered from largest to smallest shared movement.',
+    cz: 'Zhustí mnoho souvisejících ukazatelů do několika nových souhrnných řad (PC1, PC2, ...) seřazených od největšího společného pohybu po nejmenší.' },
+  { cat: 'pca', enT: 'Eigenvalue (λ) & Kaiser Rule', czT: 'Vlastní číslo (λ) a Kaiserovo pravidlo', f: 'sum of λ = number of series (7)',
+    en: 'Tells you how many input series\' worth of variance a component explains. With 7 standardized inputs, total variance = 7. Kaiser rule keeps components with λ > 1 (explains more than 1 raw series).',
+    cz: 'Říká, kolika původním řadám odpovídá rozptyl zachycený danou komponentou. U 7 standardizovaných řad je součet 7. Kaiserovo pravidlo nechává komponenty s λ > 1.' },
+  { cat: 'pca', enT: 'Loadings (Eigenvector Weights)', czT: 'Zátěže (váhy / vlastní vektor)', f: 'PC1 = w₁z₁ + w₂z₂ + ...',
+    en: 'The recipe weights showing how much each input series contributes to a component. Equal positive weights across all 6 price series prove PC1 is a broad inflation wave.',
+    cz: 'Váhy v „receptu“, které ukazují, kolik každá vstupní řada přispívá do komponenty. Vyrovnané kladné váhy všech 6 cenových řad dokazují, že PC1 je plošná inflační vlna.' },
+  { cat: 'pca', enT: 'Orthogonal Components', czT: 'Ortogonální komponenty', f: 'cor(PC1, PC2) = 0',
+    en: 'Every principal component is perpendicular (zero correlation) to every other component. So PC2 captures only the independent movement (exchange rate) that PC1 did not already explain.',
+    cz: 'Každá hlavní komponenta je kolmá (nulová korelace) na ostatní. PC2 tedy zachycuje jen nezávislý pohyb (kurz), který už není obsažený v PC1.' },
+  { cat: 'pca', enT: 'Scree Plot', czT: 'Scree plot (graf vlastních čísel)', f: 'bar chart of λ₁, λ₂, ..., λ₇',
+    en: 'A chart of eigenvalues from largest to smallest. A sharp "elbow" drop after PC1 (69.3% ➔ 12.9%) visually confirms one strong dominant factor.',
+    cz: 'Graf vlastních čísel od největšího po nejmenší. Prudký „loket“ (skok dolů) za PC1 (69,3 % ➔ 12,9 %) jasně ukazuje jeden silný společný faktor.' },
+  { cat: 'pca', enT: 'Arbitrary Sign of a Component', czT: 'Libovolné znaménko komponenty', f: 'PC1 and −PC1 have identical variance',
+    en: 'PCA finds an axis (a line), not which end is positive. Flipping PC1 to −PC1 changes nothing mathematically, so we orient it to rise when inflation rises.',
+    cz: 'PCA najde přímku, ne to, který konec je kladný. Otočení PC1 na −PC1 matematicky nic nezmění, proto ho nastavíme tak, aby rostl spolu s inflací.' },
+  { cat: 'stat', enT: 'Robustness Check', czT: 'Kontrola robustnosti', f: 'r(PC1_7, PC1_8) = 0.996',
+    en: 'Re-running the analysis with an extra variable or shorter sample (here adding import prices from 2015) to prove the main conclusion does not collapse when assumptions change slightly.',
+    cz: 'Opakování analýzy s další proměnnou nebo kratším vzorkem (tady přidání dovozních cen od 2015), které prokáže, že hlavní výsledek je stabilní.' },
+  { cat: 'stat', enT: 'HICP vs. Core Inflation vs. PPI', czT: 'HICP, jádrová inflace (Core) a PPI', f: 'consumer vs. core vs. factory prices',
+    en: 'HICP = full consumer basket (left out as benchmark). Core = services + goods (excluded to avoid double-counting). PPI = factory-gate producer prices (often moves earlier than shop prices).',
+    cz: 'HICP = celý spotřebitelský koš (mimo PCA jako srovnání). Core = služby + zboží (vyloučeno kvůli duplicitě). PPI = ceny u výrobců (často reagují dříve než ceny v obchodech).' }
+];
+let glossCat = 'all';
+function setGlossCat(c) {
+  glossCat = c;
+  ['all', 'ts', 'pca', 'stat'].forEach(k => {
+    const b = document.getElementById('gcat-' + k);
+    if (b) b.classList.toggle('active', k === c);
+  });
+  renderGlossary();
+}
+function renderGlossary() {
+  const grid = document.getElementById('gloss-grid');
+  if (!grid) return;
+  const inp = document.getElementById('gloss-search');
+  if (inp) {
+    inp.placeholder = LANG === 'en'
+      ? 'Search a concept (e.g. unit root, eigenvalue, SIC)...'
+      : 'Hledat pojem (např. jednotkový kořen, vlastní číslo, SIC)...';
+  }
+  const q = (inp ? inp.value : '').trim().toLowerCase();
+  const catNames = {
+    ts:   LANG === 'en' ? 'Time Series' : 'Časové řady',
+    pca:  'PCA',
+    stat: LANG === 'en' ? 'Stats & Macro' : 'Statistika & Makro'
+  };
+  const items = GLOSSARY.filter(g => {
+    if (glossCat !== 'all' && g.cat !== glossCat) return false;
+    if (!q) return true;
+    const hay = `${g.enT} ${g.czT} ${g.en} ${g.cz} ${g.f}`.toLowerCase();
+    return hay.includes(q);
+  });
+  if (!items.length) {
+    grid.innerHTML = `<div style="color:var(--muted); font-size:13.5px; padding:12px 0;">
+      ${LANG === 'en' ? 'No matching terms.' : 'Žádný odpovídající pojem.'}
+    </div>`;
+    return;
+  }
+  grid.innerHTML = items.map(g => `
+    <div class="gloss-card">
+      <div class="gloss-top">
+        <div class="gloss-term">${LANG === 'en' ? g.enT : g.czT}</div>
+        <span class="gloss-cat">${catNames[g.cat]}</span>
+      </div>
+      <div class="gloss-def">${LANG === 'en' ? g.en : g.cz}</div>
+      ${g.f ? `<div class="gloss-formula">${escHtml(g.f)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
 /* ==================== 8. INLINE COMMENTS (PRIVATE BACKEND) ==================== */
 const CMT_API = 'https://study-notes-api-xrriblun7a-oa.a.run.app';
 const PAGE_SLUG = 'pca-timeseries-guide';
@@ -2008,7 +2211,8 @@ const SEC_META = [
   { id: 'sec-pca-geom',    en: 'Step 4 · PCA Geometry',          cz: 'Krok 4 · Geometrie PCA' },
   { id: 'sec-loadings',    en: 'Step 5 · Scree & Loadings',      cz: 'Krok 5 · Scree a zátěže' },
   { id: 'sec-eviews',      en: 'Step 6 · EViews Commands',       cz: 'Krok 6 · EViews příkazy' },
-  { id: 'sec-quiz',        en: 'Step 7 · Q&A Flashcards',        cz: 'Krok 7 · Otázky a odpovědi' }
+  { id: 'sec-quiz',        en: 'Step 7 · Q&A Flashcards',        cz: 'Krok 7 · Otázky a odpovědi' },
+  { id: 'sec-glossary',    en: 'Step 8 · Glossary',              cz: 'Krok 8 · Slovníček pojmů' }
 ];
 
 function escHtml(s) {
